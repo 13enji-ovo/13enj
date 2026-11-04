@@ -732,24 +732,14 @@
          { id, brand, subtype （细分款式）, season （系列/款号）, title,
            size （规格）, grade （商品状态）, price (USD), img (photo URL),
            url (Lolobuy / 微店 buy link), rawUrl （微店/原始链接）,
-           note （备注）, check （商品说明） } */
-      var PRODUCTS = [
-  {
-    "id": "wd7893334068",
-    "brand": "13enj!",
-    "subtype": "连帽外套",
-    "season": "AW04",
-    "title": "自主Number(N)ine风格aw04 Black Tribal Heart黑色荆棘连帽外套",
-    "size": "",
-    "grade": "B",
-    "price": 1,
-    "img": "https://si.geilicdn.com/ch2118673871-0347000001a1a54f31070a2315ef-unadjust_1170_2532.png?w=750",
-    "url": "https://www.lolobuy.com/productDetail/7893334068?url=https://weidian.com/item.html?itemID=7893334068&inviteCode=3smqb",
-    "rawUrl": "https://weidian.com/item.html?itemID=7893334068",
-    "note": "测试上架，价格待定",
-    "check": ""
-  }
-];
+           note （备注）, check （商品说明） }
+         Multilingual fields (for batch imports): title, subtype, note and
+         size may be a plain string OR an object keyed by language, e.g.
+           "title": { "zh": "…", "en": "…", "ru": "…", "es": "…" }
+         Display uses loc(): current LANG → en → zh → first value.
+         Subtype filtering groups by subKey() (the zh value, else en/first),
+         and search matches every language. */
+      var PRODUCTS = [];
 
       /* Header promo + links — owner fills these in.
          COUPON_URL: the Lolobuy coupon claim link. MY_LINKS: [{label, url}]. */
@@ -764,7 +754,7 @@
          data-i18n / data-i18n-html / data-i18n-ph / data-i18n-aria and
          swapped by applyStatic(); everything rendered by JS goes through
          t(). Only the shop's own interface text is translated — product
-         data the owner types in (brand, title, notes) is never touched. */
+         data (title, subtype, note, size) may carry its own translations — see loc(). */
       var LOCALES = { zh: "zh-CN", en: "en-US", ru: "ru-RU", es: "es-ES" };
       var LANG = "en";
       var I18N = {
@@ -1021,6 +1011,25 @@ lblSeason: "Serie / referencia",
 
         }
       };
+      function loc(v) {
+        if (v == null) return "";
+        if (typeof v !== "object") return String(v);
+        if (v[LANG]) return v[LANG];
+        if (v.en) return v.en;
+        if (v.zh) return v.zh;
+        for (var k in v) if (v[k]) return v[k];
+        return "";
+      }
+      function locAll(v) {
+        if (v == null) return "";
+        if (typeof v !== "object") return String(v);
+        return Object.keys(v).map(function (k) { return v[k]; }).join(" ");
+      }
+      function subKey(v) {
+        if (v == null || v === "") return "";
+        if (typeof v !== "object") return String(v);
+        return v.zh || v.en || loc(v);
+      }
       function t(k) {
         var d = I18N[LANG] || I18N.zh;
         return d[k] != null ? d[k] : (I18N.zh[k] != null ? I18N.zh[k] : k);
@@ -1079,21 +1088,21 @@ lblSeason: "Serie / referencia",
       /* ---------- product cards ---------- */
       function cardHTML(item) {
         var media = item.img
-          ? '<img src="' + esc(item.img) + '" alt="' + esc(item.brand + " — " + item.title) + '" loading="lazy" />'
+          ? '<img src="' + esc(item.img) + '" alt="' + esc(item.brand + " — " + loc(item.title)) + '" loading="lazy" />'
           : '<div class="noimg">' + esc(item.brand) + "<br/>" + esc(t("noPhoto")) + "</div>";
         var metaBits = [];
-        if (item.subtype) metaBits.push(esc(item.subtype));
-        metaBits.push(esc(item.size || (t("specLabel") + " —")));
+        if (loc(item.subtype)) metaBits.push(esc(loc(item.subtype)));
+        metaBits.push(esc(loc(item.size) || (t("specLabel") + " —")));
         metaBits.push(esc(gradeLabel(item.grade)));
         return (
           '<article class="card">' +
-            '<button class="imgwrap" type="button" data-pd="' + esc(item.id) + '" aria-label="' + esc(t("viewDetails") + item.title) + '">' +
+            '<button class="imgwrap" type="button" data-pd="' + esc(item.id) + '" aria-label="' + esc(t("viewDetails") + loc(item.title)) + '">' +
               media + (item.fresh ? '<span class="fresh">' + esc(t("fresh")) + "</span>" : "") +
             "</button>" +
             '<div class="cbody">' +
               '<div class="brandline"><span class="brand">' + esc(item.brand) + "</span>" +
               (item.season ? '<span class="season">' + esc(item.season) + "</span>" : "") + "</div>" +
-              '<button class="pname" type="button" data-pd="' + esc(item.id) + '">' + esc(item.title) + "</button>" +
+              '<button class="pname" type="button" data-pd="' + esc(item.id) + '">' + esc(loc(item.title)) + "</button>" +
               '<div class="meta">' + metaBits.join(" · ") + "</div>" +
               '<div class="pricerow"><span class="price">' + money(item.price) + "</span><small>" + esc(t("usd")) + "</small></div>" +
               '<div class="actions">' +
@@ -1107,9 +1116,9 @@ lblSeason: "Serie / referencia",
 
       function matches(item, q) {
         if (state.brand && item.brand !== state.brand) return false;
-        if (state.subtype && item.subtype !== state.subtype) return false;
+        if (state.subtype && subKey(item.subtype) !== state.subtype) return false;
         if (!q) return true;
-        var hay = (item.brand + " " + (item.subtype || "") + " " + item.title + " " + (item.season || "") + " " + (item.note || "")).toLowerCase();
+        var hay = (item.brand + " " + locAll(item.subtype) + " " + locAll(item.title) + " " + (item.season || "") + " " + locAll(item.note) + " " + locAll(item.size)).toLowerCase();
         return hay.indexOf(q) !== -1;
       }
 
@@ -1125,11 +1134,13 @@ lblSeason: "Serie / referencia",
           el.addEventListener("click", function () { state.brand = el.getAttribute("data-brand"); render(); });
         });
 
-        var subs = uniq(PRODUCTS.map(function (f) { return f.subtype; }));
+        var subs = uniq(PRODUCTS.map(function (f) { return subKey(f.subtype); }));
+        var subLabel = {};
+        PRODUCTS.forEach(function (f) { var k = subKey(f.subtype); if (k && !subLabel[k]) subLabel[k] = loc(f.subtype); });
         if (state.subtype && subs.indexOf(state.subtype) === -1) state.subtype = "";
         var opts = ['<option value="">' + esc(t("allStyles")) + "</option>"];
         subs.forEach(function (s) {
-          opts.push('<option value="' + esc(s) + '"' + (state.subtype === s ? " selected" : "") + ">" + esc(s) + "</option>");
+          opts.push('<option value="' + esc(s) + '"' + (state.subtype === s ? " selected" : "") + ">" + esc(subLabel[s] || s) + "</option>");
         });
         subtypeSel.innerHTML = opts.join("");
       }
@@ -1282,18 +1293,18 @@ lblSeason: "Serie / referencia",
           var item = findProduct(id);
           var qty = cart[id];
           var media = item.img
-            ? '<img src="' + esc(item.img) + '" alt="' + esc(item.brand + " — " + item.title) + '" loading="lazy" />'
+            ? '<img src="' + esc(item.img) + '" alt="' + esc(item.brand + " — " + loc(item.title)) + '" loading="lazy" />'
             : '<div class="noimg">' + esc(item.brand) + "</div>";
           var metaBits = [];
-          if (item.subtype) metaBits.push(esc(item.subtype));
-          if (item.size) metaBits.push(esc(t("specLabel")) + " " + esc(item.size));
+          if (loc(item.subtype)) metaBits.push(esc(loc(item.subtype)));
+          if (loc(item.size)) metaBits.push(esc(t("specLabel")) + " " + esc(loc(item.size)));
           metaBits.push(esc(gradeLabel(item.grade)));
           return (
             '<div class="crow">' +
               '<div class="cthumb">' + media + "</div>" +
               "<div>" +
                 '<div class="cbrand">' + esc(item.brand) + (item.season ? " · " + esc(item.season) : "") + "</div>" +
-                '<div class="cname">' + esc(item.title) + "</div>" +
+                '<div class="cname">' + esc(loc(item.title)) + "</div>" +
                 '<div class="cmeta">' + metaBits.join(" · ") + "</div>" +
                 '<div class="cctrl">' +
                   '<span class="stepper">' +
@@ -1315,7 +1326,7 @@ lblSeason: "Serie / referencia",
           var qty = cart[id];
           return (
             '<div class="co-row">' +
-              '<div class="coname">' + esc(item.title) + "<span>" + esc(item.brand) + " · " + esc(t("qtyWord")) + " × " + qty + "</span></div>" +
+              '<div class="coname">' + esc(loc(item.title)) + "<span>" + esc(item.brand) + " · " + esc(t("qtyWord")) + " × " + qty + "</span></div>" +
               '<span class="coprice">' + money(item.price * qty) + "</span>" +
               '<a class="buy" href="' + esc(item.url) + '" target="_blank" rel="noopener noreferrer">' + esc(t("payNow")) + "</a>" +
             "</div>"
@@ -1365,19 +1376,19 @@ lblSeason: "Serie / referencia",
 
       function fillDetail(item) {
         document.getElementById("pdBrand").textContent = item.brand + (item.season ? " · " + item.season : "");
-        document.getElementById("pdTitle").textContent = item.title;
-        document.getElementById("pdSubtype").textContent = item.subtype || "—";
+        document.getElementById("pdTitle").textContent = loc(item.title);
+        document.getElementById("pdSubtype").textContent = loc(item.subtype) || "—";
         document.getElementById("pdSeason").textContent = item.season || "—";
-        document.getElementById("pdSize").textContent = item.size || "—";
+        document.getElementById("pdSize").textContent = loc(item.size) || "—";
         document.getElementById("pdGrade").textContent = gradeLabel(item.grade) || item.grade || "—";
         document.getElementById("pdRaw").innerHTML = item.rawUrl
           ? '<a href="' + esc(item.rawUrl) + '" target="_blank" rel="noopener noreferrer">' + esc(t("openRaw")) + "</a>"
           : "—";
-        document.getElementById("pdNote").textContent = item.note || "—";
+        document.getElementById("pdNote").textContent = loc(item.note) || "—";
         document.getElementById("pdCheck").textContent = item.check || t("pdNoDesc");
         document.getElementById("pdPrice").textContent = money(item.price);
         document.getElementById("pdImg").innerHTML = item.img
-          ? '<img src="' + esc(item.img) + '" alt="' + esc(item.brand + " — " + item.title) + '" />'
+          ? '<img src="' + esc(item.img) + '" alt="' + esc(item.brand + " — " + loc(item.title)) + '" />'
           : '<div class="noimg">' + esc(item.brand) + "<br/>" + esc(t("noPhoto")) + "</div>";
         document.getElementById("pdBuy").innerHTML = buyHTML(item);
       }
