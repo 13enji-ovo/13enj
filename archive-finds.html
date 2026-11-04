@@ -1,0 +1,1431 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>13enj!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=UnifrakturMaguntia&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #060606;
+        --bg-raise: #0f0f0f;
+        --bg-deep: #080808;
+        --ink: #e2e2e2;
+        --ink-soft: #a3a3a3;
+        --ink-faint: #6a6a6a;
+        --line: #212121;
+        --line-strong: #393939;
+        --blood: #2e2e2e;
+        --blood-bright: #414141;
+        --red: #383838;
+        --red-ink: #747474;
+        --violet: #3b3b3b;
+        --violet-soft: #888888;
+        --chip: #151515;
+        --card-hover: #151515;
+        --group-bg: #111111;
+        --imgbg: #151515;
+        --shadow: 0 18px 44px rgba(0, 0, 0, 0.72);
+        color-scheme: dark;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background-color: var(--bg);
+        background-image:
+          radial-gradient(ellipse 90% 48% at 50% -10%, rgba(255, 255, 255, 0.045), transparent 62%),
+          radial-gradient(ellipse 130% 95% at 50% 118%, rgba(0, 0, 0, 0.95), transparent 62%);
+        background-attachment: fixed;
+        color: var(--ink);
+        font-family: "EB Garamond", "Iowan Old Style", Georgia, serif;
+        font-size: 17px;
+        -webkit-font-smoothing: antialiased;
+      }
+      /* fine film grain over the whole page */
+      body::before {
+        content: ""; position: fixed; inset: 0; z-index: 2; pointer-events: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.5'/></svg>");
+        opacity: 0.32;
+        mix-blend-mode: overlay;
+      }
+      body::after {
+        content: ""; position: fixed; inset: 0; z-index: 2; pointer-events: none;
+        box-shadow: inset 0 0 180px rgba(0, 0, 0, 0.85), inset 0 0 60px rgba(8, 8, 8, 0.6);
+      }
+      ::selection { background: var(--blood); color: #ebebeb; }
+      .mono { font-family: "Cinzel", serif; }
+      a { color: inherit; }
+      button { font-family: inherit; cursor: pointer; }
+      img { display: block; max-width: 100%; }
+      .wrap { max-width: 1240px; margin: 0 auto; padding: 0 20px; }
+
+      /* ---------- top bar ---------- */
+      .topbar {
+        border-bottom: 4px double var(--blood);
+        position: sticky; top: 0; z-index: 40;
+        background: rgba(6, 6, 6, 0.97);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
+      }
+      .topbar-in { display: flex; align-items: center; gap: 14px; padding: 10px 0; flex-wrap: wrap; }
+      .wordmark {
+        font-family: "UnifrakturMaguntia", "Cinzel Decorative", serif;
+        font-weight: 400; font-size: 30px; line-height: 1; letter-spacing: 0.01em;
+        white-space: nowrap; text-decoration: none; color: var(--ink);
+        text-shadow: 0 0 16px rgba(65, 65, 65, 0.5), 0 2px 0 rgba(0, 0, 0, 0.8);
+      }
+      .wordmark .dot { color: var(--red-ink); }
+      .topbar .tag {
+        font-family: "Cinzel", serif;
+        font-size: 10.5px; letter-spacing: 0.22em; text-transform: uppercase;
+        color: var(--violet-soft); display: none;
+      }
+      @media (min-width: 860px) { .topbar .tag { display: block; } }
+      .topbar nav { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      .topbar nav a.navlink {
+        font-family: "Cinzel", serif;
+        font-size: 11.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+        text-decoration: none; padding: 8px 10px; color: var(--ink-soft);
+      }
+      .topbar nav a.navlink:hover { color: var(--red-ink); }
+      .btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        border: 1px solid var(--line-strong); background: linear-gradient(180deg, #161616, #0d0d0d); color: var(--ink);
+        font-family: "Cinzel", serif;
+        font-weight: 700; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+        padding: 10px 16px; border-radius: 2px; text-decoration: none;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 4px 14px rgba(0, 0, 0, 0.5);
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      }
+      .btn:hover { background: linear-gradient(180deg, #1f1f1f, #141414); border-color: var(--blood-bright); color: #ededed; }
+      .btn.ghost { background: transparent; color: var(--ink-soft); box-shadow: none; }
+      .btn.ghost:hover { background: #141414; color: var(--ink); border-color: var(--violet); }
+      .btn:active { transform: translateY(1px); }
+      .cartbtn {
+        background: linear-gradient(180deg, #252525, #151515);
+        border-color: #383838; color: #ebebeb;
+      }
+      .cartbtn:hover { background: linear-gradient(180deg, #2e2e2e, #1d1d1d); }
+      .cbadge {
+        display: inline-grid; place-items: center; min-width: 20px; height: 20px;
+        padding: 0 5px; border-radius: 2px; background: #080808; color: var(--red-ink);
+        border: 1px solid rgba(116, 116, 116, 0.55);
+        font-family: "Cinzel", serif; font-size: 11px; font-weight: 700; line-height: 1;
+      }
+      .btn:hover .cbadge { background: #ebebeb; color: var(--blood); border-color: #ebebeb; }
+      .langsw {
+        display: inline-flex; border: 1px solid var(--line-strong); border-radius: 2px;
+        overflow: hidden; background: var(--bg-deep); flex: none;
+      }
+      .langsw button {
+        border: 0; background: transparent; color: var(--ink-faint);
+        font-family: "Cinzel", serif; font-size: 11px; font-weight: 700;
+        letter-spacing: 0.08em; padding: 9px 10px; line-height: 1;
+      }
+      .langsw button + button { border-left: 1px solid var(--line); }
+      .langsw button:hover { color: var(--ink); }
+      .langsw button.on { background: var(--blood); color: #ededed; }
+      @media (max-width: 680px) {
+        .topbar-in { gap: 10px; }
+        .wordmark { font-size: 25px; }
+        .topbar nav { gap: 4px; }
+        .topbar nav a.navlink { display: none; }
+        .topbar .btn { padding: 8px 12px; font-size: 11px; white-space: nowrap; flex: none; }
+      }
+
+      /* ---------- shop header ---------- */
+      .sheet-head { padding: 42px 0 0; text-align: center; }
+      .sheet-head .kicker {
+        display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: center;
+        font-family: "Cinzel", serif;
+        font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft);
+        margin-bottom: 14px;
+      }
+      .sheet-head .kicker .live { color: var(--red-ink); font-weight: 700; }
+      .sheet-head .kicker .live::before {
+        content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--blood-bright); margin-right: 7px; vertical-align: 1px;
+        box-shadow: 0 0 10px rgba(65, 65, 65, 0.9);
+        animation: pulse 1.8s ease-in-out infinite;
+      }
+      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+      .sheet-head h1 {
+        margin: 0; font-family: "UnifrakturMaguntia", "Cinzel Decorative", serif;
+        font-weight: 400; letter-spacing: 0.01em; line-height: 1.05;
+        font-size: clamp(54px, 9vw, 96px); color: #e9e9e9;
+        text-shadow: 0 0 26px rgba(46, 46, 46, 0.45), 0 0 70px rgba(59, 59, 59, 0.3), 0 3px 0 rgba(0, 0, 0, 0.85);
+      }
+      .sheet-head h1 .upd {
+        display: block; margin-top: 10px;
+        font-family: "Cinzel Decorative", "Cinzel", serif; font-weight: 700;
+        font-size: clamp(13px, 2vw, 18px); letter-spacing: 0.32em; text-transform: uppercase;
+        color: var(--red-ink); text-shadow: none;
+      }
+      .sheet-head .sub {
+        margin: 20px auto 0; max-width: 700px; font-size: 18.5px; line-height: 1.65; color: var(--ink-soft);
+      }
+      .sheet-head .sub strong { color: var(--ink); }
+
+      /* coupon promo strip */
+      .coupon {
+        margin-top: 28px; border: 1px solid #383838; border-radius: 3px;
+        background:
+          repeating-linear-gradient(-38deg, rgba(226, 226, 226, 0.014) 0 2px, transparent 2px 9px),
+          linear-gradient(120deg, #0f0f0f 0%, #0e0e0e 55%, #0d0d0d 100%);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.7), inset 0 0 34px rgba(46, 46, 46, 0.14), 0 12px 30px rgba(0, 0, 0, 0.55);
+        padding: 18px 20px;
+        display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; text-align: left;
+      }
+      .coupon .big {
+        font-family: "Cinzel Decorative", "Cinzel", serif;
+        font-size: clamp(19px, 3vw, 27px); font-weight: 900; letter-spacing: 0.04em; color: #9b9b9b;
+        text-transform: uppercase; text-shadow: 0 0 18px rgba(65, 65, 65, 0.4);
+      }
+      .coupon .note { font-size: 16.5px; color: var(--ink-soft); line-height: 1.55; }
+      .coupon .pending {
+        margin-left: auto; font-family: "Cinzel", serif; font-size: 10.5px; font-weight: 700;
+        letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint);
+        border: 1px dashed var(--line-strong); border-radius: 2px; padding: 6px 10px; white-space: nowrap;
+      }
+      .coupon a.claim {
+        margin-left: auto; background: linear-gradient(180deg, #2e2e2e, #1d1d1d); color: #ededed; border: 1px solid #464646; border-radius: 2px;
+        font-family: "Cinzel", serif;
+        font-weight: 700; font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; padding: 11px 17px; text-decoration: none; white-space: nowrap;
+      }
+      .coupon a.claim:hover { background: linear-gradient(180deg, #262626, #171717); border-color: var(--violet); }
+
+      /* ALL MY LINKS strip */
+      .alllinks {
+        margin-top: 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 12px;
+        padding: 13px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+      }
+      .alllinks .cap {
+        font-family: "Cinzel", serif; font-size: 10.5px; font-weight: 700;
+        letter-spacing: 0.22em; text-transform: uppercase; color: var(--violet-soft);
+      }
+      .alllinks a.lchip {
+        border: 1px solid var(--line-strong); border-radius: 2px; padding: 7px 14px;
+        font-family: "Cinzel", serif;
+        font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-decoration: none; background: var(--bg-raise); color: var(--ink-soft);
+      }
+      .alllinks a.lchip:hover { background: var(--blood); border-color: var(--blood-bright); color: #ededed; }
+      .alllinks .none { font-size: 15px; color: var(--ink-faint); }
+      .sheet-meta {
+        display: flex; flex-wrap: wrap; gap: 8px 28px; padding: 12px 0 0;
+        font-family: "Cinzel", serif; font-size: 11px; letter-spacing: 0.14em;
+        text-transform: uppercase; color: var(--ink-soft);
+      }
+      .sheet-meta b { color: var(--ink); }
+
+      /* ---------- layout: shop + right rail ---------- */
+      .layout { display: grid; grid-template-columns: 1fr; gap: 34px; margin-top: 8px; }
+      @media (min-width: 1020px) { .layout { grid-template-columns: minmax(0, 1fr) 292px; gap: 30px; } }
+
+      /* ---------- toolbar / filters ---------- */
+      .toolbar { padding: 30px 0 4px; }
+      .toolbar .trow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+      .toolbar h2 {
+        margin: 0; font-family: "Cinzel Decorative", "Cinzel", serif;
+        font-size: 25px; font-weight: 900; letter-spacing: 0.05em; color: var(--ink);
+      }
+      .toolbar h2 .cnt { font-family: "Cinzel", serif; font-size: 12px; font-weight: 500; color: var(--ink-faint); letter-spacing: 0.08em; margin-left: 8px; }
+      .search {
+        margin-left: auto; display: flex; align-items: center; gap: 8px;
+        border: 1px solid var(--line-strong); border-radius: 2px; padding: 9px 14px;
+        background: var(--bg-deep); flex: 1 1 200px; max-width: 320px; color: var(--violet-soft);
+      }
+      .search input {
+        border: 0; outline: 0; background: transparent; color: var(--ink);
+        font: 500 16px "EB Garamond", Georgia, serif; width: 100%;
+      }
+      .search input::placeholder { color: var(--ink-faint); font-style: italic; }
+      .filters { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 16px; }
+      .filters .flabel {
+        font-family: "Cinzel", serif; font-size: 10px; font-weight: 700;
+        letter-spacing: 0.18em; text-transform: uppercase; color: var(--violet-soft);
+      }
+      .chipset { display: flex; flex-wrap: wrap; gap: 6px; }
+      .fchip {
+        border: 1px solid var(--line-strong); background: transparent; color: var(--ink-soft);
+        border-radius: 2px; padding: 6px 13px;
+        font-family: "Cinzel", serif; font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em;
+      }
+      .fchip:hover { color: var(--ink); border-color: var(--violet); }
+      .fchip.on { background: var(--blood); border-color: var(--blood-bright); color: #ededed; }
+      .filters select {
+        border: 1px solid var(--line-strong); border-radius: 2px; background: var(--bg-raise);
+        color: var(--ink); padding: 7px 10px; font: 600 13.5px "EB Garamond", Georgia, serif; outline: none;
+        max-width: 100%;
+      }
+      .filters .fgroup { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+      /* ---------- product card grid ---------- */
+      .grid {
+        display: grid; gap: 18px; margin-top: 18px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      @media (min-width: 700px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+      .grouphead {
+        grid-column: 1 / -1; display: flex; align-items: baseline; gap: 10px;
+        background: var(--group-bg); border: 1px solid var(--line-strong);
+        padding: 9px 14px; margin-top: 6px;
+        font-family: "Cinzel", serif; font-size: 11.5px; font-weight: 700;
+        letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink);
+      }
+      .grouphead .gcount { color: var(--ink-faint); font-weight: 500; letter-spacing: 0.06em; }
+      .card {
+        border: 1px solid var(--line-strong);
+        background:
+          repeating-linear-gradient(-38deg, rgba(226, 226, 226, 0.012) 0 2px, transparent 2px 10px),
+          linear-gradient(180deg, #131313 0%, #0c0c0c 100%);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(0, 0, 0, 0.55);
+        border-radius: 3px;
+        display: flex; flex-direction: column; overflow: hidden;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease;
+      }
+      .card:hover {
+        border-color: #383838;
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.7), 0 0 22px rgba(46, 46, 46, 0.16), 0 0 34px rgba(59, 59, 59, 0.12), inset 0 0 0 1px rgba(0, 0, 0, 0.55);
+      }
+      .card .imgwrap {
+        position: relative; aspect-ratio: 4 / 5; background: var(--imgbg);
+        border: 0; border-bottom: 1px solid var(--line-strong); padding: 0; width: 100%;
+        cursor: zoom-in; overflow: hidden;
+      }
+      .card .imgwrap img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.86) contrast(1.06) brightness(0.94); }
+      .card .imgwrap .noimg {
+        width: 100%; height: 100%; display: grid; place-items: center; padding: 10px;
+        font-family: "Cinzel", serif; font-size: 10.5px; letter-spacing: 0.16em;
+        text-transform: uppercase; color: var(--ink-faint); text-align: center;
+        background:
+          radial-gradient(ellipse 80% 60% at 50% 40%, rgba(59, 59, 59, 0.14), transparent 70%),
+          repeating-linear-gradient(-45deg, #131313 0 12px, #0d0d0d 12px 24px);
+      }
+      .card .fresh {
+        position: absolute; top: 10px; left: 10px;
+        background: var(--blood); color: #ededed; font-family: "Cinzel", serif;
+        font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; padding: 5px 8px; border-radius: 2px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      }
+      .card .cbody { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+      .card .brandline {
+        font-family: "Cinzel", serif; font-size: 10px; letter-spacing: 0.16em;
+        text-transform: uppercase; color: var(--ink-soft);
+        display: flex; flex-wrap: wrap; gap: 4px 9px;
+      }
+      .card .brandline .brand { font-weight: 700; color: var(--ink); }
+      .card .brandline .season { color: var(--violet-soft); font-weight: 700; }
+      .card .pname {
+        margin: 0; font-family: "Cinzel", serif;
+        font-size: 15.5px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.35;
+        background: none; border: 0; padding: 0; text-align: left; color: var(--ink);
+      }
+      .card .pname:hover { color: var(--red-ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(116, 116, 116, 0.5); }
+      .card .meta { font-family: "Cinzel", serif; font-size: 10.5px; letter-spacing: 0.05em; color: var(--ink-faint); line-height: 1.6; }
+      .card .pricerow { margin-top: auto; padding-top: 9px; display: flex; align-items: baseline; gap: 7px; }
+      .card .price { font-family: "Cinzel", serif; font-size: 21px; font-weight: 900; letter-spacing: 0.01em; color: #e9e9e9; }
+      .card .price small { font-family: "Cinzel", serif; font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+      .card .actions { display: flex; gap: 8px; margin-top: 11px; flex-wrap: wrap; }
+      .addcart {
+        flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        background: transparent; color: var(--ink-soft); border: 1px solid var(--line-strong); border-radius: 2px;
+        font-family: "Cinzel", serif;
+        font-weight: 700; font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; padding: 11px 12px; white-space: nowrap;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+      }
+      .addcart:hover { background: #171717; border-color: var(--violet); color: #e9e9e9; }
+      .addcart:active { transform: translateY(1px); }
+      .buy {
+        flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap;
+        background: linear-gradient(180deg, #2e2e2e, #1d1d1d); color: #ededed; border: 1px solid #383838; border-radius: 2px;
+        font-family: "Cinzel", serif;
+        font-weight: 700; font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; padding: 11px 14px;
+        text-decoration: none; transition: background 0.15s ease, border-color 0.15s ease;
+      }
+      .buy:hover { background: linear-gradient(180deg, #353535, #252525); border-color: var(--blood-bright); }
+      .buy:active { transform: translateY(1px); }
+
+      .empty-shelf {
+        margin-top: 18px; border: 1px dashed var(--line-strong);
+        background:
+          radial-gradient(ellipse 70% 90% at 50% 0%, rgba(59, 59, 59, 0.12), transparent 70%),
+          var(--bg-raise);
+        padding: 52px 22px; text-align: center; border-radius: 3px;
+      }
+      .empty-shelf .big {
+        font-family: "Cinzel Decorative", "Cinzel", serif;
+        font-size: 23px; font-weight: 900; letter-spacing: 0.06em; color: var(--ink);
+      }
+      .empty-shelf p { margin: 10px auto 0; max-width: 460px; font-size: 16.5px; line-height: 1.65; color: var(--ink-soft); }
+      .empty-shelf .btn { margin-top: 18px; }
+      .no-match { padding: 26px 0 4px; text-align: center; color: var(--ink-soft); font-size: 16.5px; display: none; font-style: italic; }
+      .no-match.show { display: block; }
+
+      /* ---------- right rail ---------- */
+      .rail { display: grid; gap: 22px; align-content: start; padding-top: 30px; }
+      @media (min-width: 1020px) { .rail { padding-top: 86px; } }
+      .railbox {
+        border: 1px solid var(--line-strong); border-radius: 3px;
+        background: linear-gradient(180deg, #101010, #0c0c0c);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+      }
+      .railbox h3 {
+        margin: 0; padding: 12px 14px;
+        font-family: "Cinzel", serif;
+        font-size: 13px; font-weight: 900; letter-spacing: 0.14em;
+        text-transform: uppercase; border-bottom: 3px double var(--blood);
+        display: flex; align-items: baseline; gap: 8px; color: var(--ink);
+      }
+      .railbox h3 .en { font-family: "Cinzel", serif; font-size: 9px; font-weight: 500; letter-spacing: 0.14em; color: var(--ink-faint); text-transform: uppercase; }
+      .railbox .rempty { padding: 16px 14px; font-size: 15.5px; line-height: 1.6; color: var(--ink-faint); }
+      .railbox ul.stores { margin: 0; padding: 6px 0; list-style: none; }
+      .railbox ul.stores li a {
+        display: flex; justify-content: space-between; gap: 10px; padding: 9px 14px;
+        font-size: 16px; font-weight: 600; text-decoration: none;
+      }
+      .railbox ul.stores li a:hover { background: var(--card-hover); color: var(--red-ink); }
+      .railbox ul.stores li a .arr { color: var(--red-ink); }
+      .rail .howmini { padding: 15px; font-size: 16px; line-height: 1.65; color: var(--ink-soft); }
+      .rail .howmini b { color: var(--ink); font-family: "Cinzel", serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+      .rail .howmini ol { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; }
+      .rail .howmini ol li::marker { color: var(--red-ink); font-weight: 700; }
+
+      /* ---------- footer ---------- */
+      footer { margin-top: 60px; border-top: 4px double var(--blood); padding: 24px 0 42px; }
+      footer .frow { display: flex; flex-wrap: wrap; gap: 10px 26px; justify-content: space-between; align-items: baseline; }
+      footer .wordmark { font-size: 24px !important; }
+      footer p { margin: 10px 0 0; font-size: 15px; color: var(--ink-faint); line-height: 1.65; max-width: 760px; }
+
+      /* ---------- dialogs ---------- */
+      dialog {
+        border: 1px solid #383838; border-radius: 4px; padding: 0;
+        background: linear-gradient(180deg, #121212, #0b0b0b); color: var(--ink); max-width: min(680px, calc(100vw - 28px));
+        box-shadow: var(--shadow), 0 0 44px rgba(46, 46, 46, 0.14);
+      }
+      dialog::backdrop { background: rgba(2, 2, 2, 0.84); }
+      .dlg-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
+      .dlg-head h3 {
+        margin: 0; font-family: "Cinzel Decorative", "Cinzel", serif;
+        font-size: 23px; font-weight: 900; letter-spacing: 0.04em;
+      }
+      .dlg-head p { margin: 5px 0 0; font-size: 16px; color: var(--ink-soft); line-height: 1.6; }
+      .x {
+        margin-left: auto; flex: none; width: 36px; height: 36px; border-radius: 2px;
+        border: 1px solid var(--line-strong); background: transparent; color: var(--ink-soft);
+        font-size: 16px; line-height: 1;
+      }
+      .x:hover { background: var(--blood); border-color: var(--blood-bright); color: #ededed; }
+
+      /* ---------- product detail ---------- */
+      dialog.pd { max-width: min(880px, calc(100vw - 28px)); }
+      .pd-grid { display: grid; gap: 0; grid-template-columns: 1fr; }
+      @media (min-width: 680px) { .pd-grid { grid-template-columns: 1fr 1fr; } }
+      .pd-grid .pd-img { background: var(--imgbg); min-height: 300px; }
+      .pd-grid .pd-img img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.86) contrast(1.06) brightness(0.94); }
+      .pd-grid .pd-img .noimg {
+        height: 100%; min-height: 300px; display: grid; place-items: center; padding: 18px;
+        font-family: "Cinzel", serif; font-size: 12px; letter-spacing: 0.18em;
+        text-transform: uppercase; color: var(--ink-faint); text-align: center;
+        background:
+          radial-gradient(ellipse 80% 60% at 50% 40%, rgba(59, 59, 59, 0.14), transparent 70%),
+          repeating-linear-gradient(-45deg, #131313 0 12px, #0d0d0d 12px 24px);
+      }
+      .pd-body { padding: 24px; display: flex; flex-direction: column; gap: 8px; }
+      .pd-body h3 {
+        margin: 0; font-family: "Cinzel", serif;
+        font-size: 25px; font-weight: 900; letter-spacing: 0.03em; line-height: 1.18;
+      }
+      #pdBrand { color: var(--violet-soft) !important; font-family: "Cinzel", serif; }
+      .pd-specs { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 16px; margin: 8px 0; }
+      .pd-specs dt { font-family: "Cinzel", serif; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); padding-top: 3px; }
+      .pd-specs dd { margin: 0; font-weight: 600; word-break: break-all; }
+      .pd-specs dd a { color: var(--red-ink); }
+      .pd-body .check { font-size: 16px; line-height: 1.65; color: var(--ink-soft); border-top: 1px dashed var(--line-strong); padding-top: 11px; }
+      .pd-body .check b { color: var(--ink); font-family: "Cinzel", serif; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+      .pd-foot { margin-top: auto; padding-top: 14px; }
+      .pd-foot .price { font-family: "Cinzel", serif; font-size: 28px; font-weight: 900; letter-spacing: 0.01em; }
+      .pd-foot .price small { font-family: "Cinzel", serif; font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-left: 6px; }
+      .qtyrow { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+      .qtyrow .qlabel { font-family: "Cinzel", serif; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); }
+      .stepper { display: inline-flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 2px; overflow: hidden; background: var(--bg-deep); }
+      .stepper button {
+        width: 34px; height: 36px; border: 0; background: transparent; color: var(--ink);
+        font-size: 17px; font-weight: 700; line-height: 1;
+      }
+      .stepper button:hover { background: var(--blood); color: #ededed; }
+      .stepper .qv-num { min-width: 30px; text-align: center; font-weight: 700; font-size: 16px; font-family: "Cinzel", serif; }
+      .pd-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+      .pd-actions .addcart, .pd-actions .buy { padding: 13px 18px; font-size: 12px; }
+
+      /* ---------- cart (modal sheet) ---------- */
+      dialog.cartdlg {
+        margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh;
+        width: min(430px, 100vw); max-width: 100vw;
+        border: 0; border-left: 1px solid #383838; border-radius: 0;
+        background: linear-gradient(180deg, #101010, #080808);
+      }
+      dialog.cartdlg[open] { display: flex; flex-direction: column; animation: slidein 0.2s ease; }
+      @keyframes slidein { from { transform: translateX(36px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+      .cp-head {
+        display: flex; align-items: center; gap: 10px; padding: 17px 18px;
+        border-bottom: 3px double var(--blood);
+      }
+      .cp-head h3 {
+        margin: 0; font-family: "Cinzel Decorative", "Cinzel", serif;
+        font-size: 20px; font-weight: 900; letter-spacing: 0.05em;
+      }
+      .cp-head .cnt { font-family: "Cinzel", serif; font-size: 11.5px; font-weight: 500; color: var(--ink-faint); }
+      .cp-body { flex: 1; overflow-y: auto; padding: 6px 18px 18px; }
+      .cp-empty { padding: 38px 6px; text-align: center; color: var(--ink-soft); font-size: 16px; line-height: 1.65; }
+      .cp-empty .big { font-family: "Cinzel", serif; font-size: 18px; font-weight: 900; letter-spacing: 0.04em; color: var(--ink); }
+      .crow {
+        display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 12px;
+        padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start;
+      }
+      .crow .cthumb { width: 56px; height: 66px; border: 1px solid var(--line-strong); border-radius: 2px; overflow: hidden; background: var(--imgbg); }
+      .crow .cthumb img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.86) contrast(1.06) brightness(0.94); }
+      .crow .cthumb .noimg {
+        width: 100%; height: 100%; display: grid; place-items: center; padding: 3px;
+        font-family: "Cinzel", serif; font-size: 7.5px; letter-spacing: 0.08em;
+        text-transform: uppercase; color: var(--ink-faint); text-align: center;
+      }
+      .crow .cbrand { font-family: "Cinzel", serif; font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--violet-soft); }
+      .crow .cname { font-family: "Cinzel", serif; font-size: 13.5px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.35; margin-top: 3px; }
+      .crow .cmeta { font-family: "Cinzel", serif; font-size: 10px; letter-spacing: 0.04em; color: var(--ink-faint); margin-top: 3px; }
+      .crow .cctrl { display: flex; align-items: center; gap: 10px; margin-top: 9px; flex-wrap: wrap; }
+      .crow .stepper button { width: 28px; height: 30px; font-size: 15px; }
+      .crow .stepper .qv-num { min-width: 24px; font-size: 13px; }
+      .crow .rm {
+        border: 0; background: transparent; color: var(--red-ink); padding: 4px 0;
+        font: 700 11px "Cinzel", serif; letter-spacing: 0.1em; text-transform: uppercase;
+      }
+      .crow .rm:hover { color: var(--ink); }
+      .crow .cline { text-align: right; }
+      .crow .cprice { font-family: "Cinzel", serif; font-size: 16px; font-weight: 900; white-space: nowrap; }
+      .crow .cunit { font-family: "Cinzel", serif; font-size: 9.5px; letter-spacing: 0.06em; color: var(--ink-faint); white-space: nowrap; margin-top: 3px; }
+      .cp-checkout { margin-top: 20px; border-top: 1px solid var(--line-strong); padding-top: 14px; }
+      .cp-checkout h4 { margin: 0 0 4px; font-family: "Cinzel", serif; font-size: 13.5px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+      .cp-checkout p { margin: 0 0 10px; font-size: 15px; line-height: 1.6; color: var(--ink-soft); }
+      .co-row {
+        display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--line);
+      }
+      .co-row:last-of-type { border-bottom: 0; }
+      .co-row .coname { flex: 1; min-width: 0; font-size: 15.5px; font-weight: 600; line-height: 1.4; }
+      .co-row .coname span { display: block; font-family: "Cinzel", serif; font-size: 9.5px; font-weight: 500; letter-spacing: 0.06em; color: var(--ink-faint); margin-top: 2px; }
+      .co-row .coprice { font-family: "Cinzel", serif; font-size: 14px; font-weight: 900; white-space: nowrap; }
+      .co-row .buy { flex: none; padding: 9px 12px; font-size: 11px; }
+      .cp-foot { border-top: 3px double var(--blood); padding: 15px 18px 18px; background: #090909; }
+      .cp-total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+      .cp-total .tlabel { font-family: "Cinzel", serif; font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); }
+      .cp-total .tval { font-family: "Cinzel", serif; font-size: 25px; font-weight: 900; letter-spacing: 0.01em; }
+      .cp-foot .note { margin: 6px 0 12px; font-size: 14.5px; line-height: 1.55; color: var(--ink-faint); }
+      .checkout-btn {
+        width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        background: linear-gradient(180deg, #2e2e2e, #1d1d1d); color: #ededed; border: 1px solid #383838; border-radius: 2px;
+        font-family: "Cinzel", serif;
+        font-weight: 700; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; padding: 15px 18px;
+        transition: background 0.15s ease, border-color 0.15s ease;
+      }
+      .checkout-btn:hover { background: linear-gradient(180deg, #262626, #171717); border-color: var(--violet); }
+      .checkout-btn:active { transform: translateY(1px); }
+      .checkout-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+      .toast {
+        position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px);
+        background: #101010; color: #e9e9e9; border: 1px solid #383838; padding: 13px 20px; border-radius: 2px;
+        font-family: "Cinzel", serif; letter-spacing: 0.04em;
+        font-size: 13.5px; font-weight: 700; opacity: 0; pointer-events: none; z-index: 90;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 22px rgba(46, 46, 46, 0.2);
+        transition: opacity 0.2s ease, transform 0.2s ease; max-width: calc(100vw - 32px); text-align: center;
+      }
+      .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+      @media (prefers-reduced-motion: reduce) {
+        .sheet-head .kicker .live::before { animation: none; }
+        html { scroll-behavior: auto; }
+        .btn, .buy, .addcart, .checkout-btn, .card { transition: none; }
+        dialog.cartdlg[open] { animation: none; }
+      }
+
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-in">
+        <a class="wordmark" href="#top"><span data-i18n="shopName">13enj!</span></a>
+        <span class="tag mono" data-i18n="tagline">精选好物 · 持续上新</span>
+        <nav>
+          <a class="navlink" href="#list" data-i18n="navAll">全部商品</a>
+          <a class="navlink" href="#stores" id="navStoresLink" data-i18n="navStores">合作店铺</a>
+          <a class="btn ghost" href="https://muse.ai/s/lian-jie-ye-xlxs6xgyxdxpxrxcxu9/pofkXrXbVxHOMx6-DkATQolL2msBx7Yy-6YpOq8FjK0" target="_blank" rel="noopener noreferrer"><span data-i18n="navLinks">My links</span> ↗</a>
+          <span class="langsw" role="group" aria-label="Language / 语言">
+            <button type="button" data-lang="en" class="on">EN</button>
+            <button type="button" data-lang="zh">中文</button>
+            <button type="button" data-lang="ru">RU</button>
+            <button type="button" data-lang="es">ES</button>
+          </span>
+          <button class="btn cartbtn" id="openCart" type="button"><span data-i18n="cart">购物车</span> <span class="cbadge" id="cartCount">0</span></button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap" id="top">
+      <!-- SHOP HEADER: title + coupon promo + all my links -->
+      <section class="sheet-head">
+        <h1><span data-i18n="shopName">13enj!</span> <span class="upd" data-i18n="h1Upd">（持续更新）</span></h1>
+        <p class="sub" data-i18n-html="subHTML">
+          欢迎来到<strong>13enj!</strong>！这里有你想要的，新品持续上架。看中哪件，点开卡片看详情，
+          加购物车或直接购买——付款走 <strong>Lolobuy / 微店</strong>，下单后直接寄到你家。
+        </p>
+
+        <div class="coupon">
+          <span class="big" data-i18n="couponBig">Lolobuy 500$ 运费券</span>
+          <span class="note" data-i18n="couponNote">新用户福利：领取运费券礼包，通过 Lolobuy 下单时抵扣运费。</span>
+          <span class="pending" id="couponSlot">领取运费券 ↗</span>
+        </div>
+
+        <div class="alllinks" id="allLinksBar">
+          <span class="cap" data-i18n="allLinksCap">我的全部链接 · All my links</span>
+          <span id="allLinks"></span>
+        </div>
+      </section>
+
+      <div class="layout">
+        <!-- SHOP -->
+        <section id="list">
+          <div class="toolbar">
+            <div class="trow">
+              <h2><span data-i18n="navAll">全部商品</span><span class="cnt" id="listCount"></span></h2>
+              <div class="search">
+                <span aria-hidden="true">⌕</span>
+                <input id="searchInput" type="search" placeholder="搜索品牌、商品、款式…" aria-label="搜索商品" data-i18n-ph="searchPh" data-i18n-aria="searchAria" />
+              </div>
+            </div>
+            <div class="filters">
+              <div class="fgroup">
+                <span class="flabel" data-i18n="fBrand">品牌</span>
+                <span class="chipset" id="brandChips"></span>
+              </div>
+              <div class="fgroup">
+                <span class="flabel" data-i18n="fSubtype">细分款式</span>
+                <select id="subtypeFilter" aria-label="按细分款式筛选" data-i18n-aria="subtypeAria"></select>
+              </div>
+              <div class="fgroup">
+                <span class="flabel" data-i18n="fGroup">分组</span>
+                <select id="groupBy" aria-label="分组方式" data-i18n-aria="groupAria">
+                  <option value="none" data-i18n="gNone">不分组</option>
+                  <option value="brand" data-i18n="gBrand">按品牌分组</option>
+                  <option value="subtype" data-i18n="gSubtype">按细分款式分组</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid" id="grid"></div>
+          <div class="empty-shelf" id="emptyShelf" hidden>
+            <div class="big" data-i18n="emptyBig">新品即将上架</div>
+            <p data-i18n="emptyText">货架正在备货中，新一批好物马上就来——过几天再来逛逛，别错过第一波上新。</p>
+          </div>
+          <p class="no-match" id="noMatch" data-i18n="noMatch">按现在的筛选，还没有符合的商品。</p>
+        </section>
+
+        <!-- RIGHT RAIL -->
+        <aside class="rail">
+          <div class="railbox" id="stores">
+            <h3><span data-i18n="navStores">合作店铺</span> <span class="en">Affiliated stores</span></h3>
+            <div id="storeList"></div>
+          </div>
+          <div class="railbox">
+            <h3 data-i18n="howTitle">购买流程</h3>
+            <div class="howmini">
+              <b data-i18n="howSteps">三步：</b>
+              <ol>
+                <li data-i18n="how1">在货架上挑货，点开商品看详情，或者直接加进购物车。</li>
+                <li data-i18n="how2">去结账付款：每件商品都会打开对应的 Lolobuy / 微店购买页面，在那边付款下单。</li>
+                <li data-i18n="how3">等收货：订单打包发出，直接寄到你家门口。</li>
+              </ol>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <footer>
+        <div class="frow">
+          <span class="wordmark"><span data-i18n="shopName">13enj!</span></span>
+          <span class="mono" style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);" data-i18n="footTag">新品持续上架</span>
+        </div>
+        <p data-i18n-html="footHTML">
+          本站商品通过 Lolobuy / 微店完成下单和付款：每个购买按钮都会打开对应商品的购买页面，
+          付款、物流和售后按对应平台的规则处理。商品售出或补货后，价格可能调整。
+        </p>
+      </footer>
+    </main>
+
+    <!-- CART -->
+    <dialog class="cartdlg" id="cartPanel" aria-label="购物车" data-i18n-aria="cart">
+      <div class="cp-head">
+        <h3 data-i18n="cart">购物车</h3>
+        <span class="cnt" id="cartHeadCount"></span>
+        <button class="x" type="button" id="cartClose" aria-label="关闭购物车" data-i18n-aria="closeCart">✕</button>
+      </div>
+      <div class="cp-body" id="cartBody"></div>
+      <div class="cp-foot" id="cartFoot"></div>
+    </dialog>
+
+    <!-- PRODUCT DETAIL -->
+    <dialog class="pd" id="pdDlg" aria-labelledby="pdTitle">
+      <div class="pd-grid">
+        <div class="pd-img" id="pdImg"></div>
+        <div class="pd-body">
+          <div class="dlg-head" style="margin-bottom:0;">
+            <div>
+              <div class="mono" id="pdBrand" style="font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase;"></div>
+              <h3 id="pdTitle"></h3>
+            </div>
+            <button class="x" type="button" data-close aria-label="关闭" data-i18n-aria="close">✕</button>
+          </div>
+          <dl class="pd-specs">
+            <dt data-i18n="fSubtype">细分款式</dt><dd id="pdSubtype"></dd>
+            <dt data-i18n="lblSeason">系列 / 款号</dt><dd id="pdSeason"></dd>
+            <dt data-i18n="specLabel">规格</dt><dd id="pdSize"></dd>
+            <dt data-i18n="dStatus">状态</dt><dd id="pdGrade"></dd>
+            <dt data-i18n="lblRaw">微店 / 原始链接</dt><dd id="pdRaw"></dd>
+            <dt data-i18n="lblNote">备注</dt><dd id="pdNote"></dd>
+          </dl>
+          <div class="check"><b data-i18n="lblCheck">商品说明</b><span id="pdCheck"></span></div>
+          <div class="pd-foot">
+            <div class="price"><span id="pdPrice"></span><small data-i18n="usdSeller">美元 · 卖家定价</small></div>
+            <div class="qtyrow">
+              <span class="qlabel" data-i18n="qty">数量</span>
+              <span class="stepper">
+                <button type="button" id="pdMinus" aria-label="减少数量" data-i18n-aria="decQty">−</button>
+                <span class="qv-num" id="pdQty">1</span>
+                <button type="button" id="pdPlus" aria-label="增加数量" data-i18n-aria="incQty">+</button>
+              </span>
+            </div>
+            <div class="pd-actions">
+              <button class="addcart" type="button" id="pdAddCart" data-i18n="addToCart">加入购物车</button>
+              <span id="pdBuy" style="display:contents;"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script>
+      "use strict";
+
+      /* ============ DATA ============
+         The shelf starts empty on purpose — only the owner stocks
+         products here (any category): he sends each product and it is
+         baked in here. There is no add-product UI on the page.
+         Product shape:
+         { id, brand, subtype （细分款式）, season （系列/款号）, title,
+           size （规格）, grade （商品状态）, price (USD), img (photo URL),
+           url (Lolobuy / 微店 buy link), rawUrl （微店/原始链接）,
+           note （备注）, check （商品说明） } */
+      var PRODUCTS = [];
+
+      /* Header promo + links — owner fills these in.
+         COUPON_URL: the Lolobuy coupon claim link. MY_LINKS: [{label, url}]. */
+      var COUPON_URL = "https://m.lolobuy.com/index?inviteCode=3smqb";
+      var MY_LINKS = [];
+
+      /* Right rail — affiliated stores: [{name, url}] */
+      var STORES = [];
+
+      /* ============ I18N ============
+         Four languages, English by default. Static text is tagged with
+         data-i18n / data-i18n-html / data-i18n-ph / data-i18n-aria and
+         swapped by applyStatic(); everything rendered by JS goes through
+         t(). Only the shop's own interface text is translated — product
+         data the owner types in (brand, title, notes) is never touched. */
+      var LOCALES = { zh: "zh-CN", en: "en-US", ru: "ru-RU", es: "es-ES" };
+      var LANG = "en";
+      var I18N = {
+        zh: {
+          docTitle: "13enj!", shopName: "13enj!", tagline: "精选好物 · 持续上新",
+          navAll: "全部商品", navStores: "合作店铺", navLinks: "我的链接页",cart: "购物车",
+          closeCart: "关闭购物车", close: "关闭",
+          h1Upd: "（持续更新）",
+          subHTML: "欢迎来到<strong>13enj!</strong>！这里有你想要的，新品持续上架。看中哪件，点开卡片看详情，加购物车或直接购买——付款走 <strong>Lolobuy / 微店</strong>，下单后直接寄到你家。",
+          couponBig: "Lolobuy 500$ 运费券",
+          couponNote: "新用户福利：领取运费券礼包，通过 Lolobuy 下单时抵扣运费。",
+          couponPending: "领取运费券 ↗", couponClaim: "领取运费券 ↗",
+          allLinksCap: "我的全部链接 · All my links",
+          searchPh: "搜索品牌、商品、款式…", searchAria: "搜索商品",
+          subtypeAria: "按细分款式筛选", groupAria: "分组方式",
+          fBrand: "品牌", fSubtype: "细分款式", fGroup: "分组",
+          gNone: "不分组", gBrand: "按品牌分组", gSubtype: "按细分款式分组",
+          allBrands: "全部品牌", allStyles: "全部款式", uncat: "未分类",
+          groupCount: "{n} 件", countItems: "共 {n} 件",
+          noMatch: "按现在的筛选，还没有符合的商品。",
+          emptyBig: "新品即将上架",
+          emptyText: "货架正在备货中，新一批好物马上就来——过几天再来逛逛，别错过第一波上新。",
+          howTitle: "购买流程", howSteps: "三步：",
+          how1: "在货架上挑货，点开商品看详情，或者直接加进购物车。",
+          how2: "去结账付款：每件商品都会打开对应的 Lolobuy / 微店购买页面，在那边付款下单。",
+          how3: "等收货：订单打包发出，直接寄到你家门口。",
+          footTag: "新品持续上架",
+          footHTML: "本站商品通过 Lolobuy / 微店完成下单和付款：每个购买按钮都会打开对应商品的购买页面，付款、物流和售后按对应平台的规则处理。商品售出或补货后，价格可能调整。",
+
+
+lblSeason: "系列 / 款号",
+          specLabel: "规格", lblGrade: "商品状态",
+          gradeA: "现货充足", gradeB: "现货", gradeC: "预售 / 订货",
+
+
+          lblRaw: "微店 / 原始链接",lblNote: "备注", lblCheck: "商品说明",
+
+
+
+
+
+
+
+
+
+
+
+          dStatus: "状态", openRaw: "打开原始链接 ↗",
+          pdNoDesc: "这件商品暂无更多说明，详情以卡片上的信息为准。",
+          usdSeller: "美元 · 卖家定价", usd: "美元", qty: "数量", qtyWord: "数量",
+          buyNow: "立即购买 ↗", addToCart: "加入购物车",
+          noPhoto: "暂无图片", fresh: "新上架", viewDetails: "查看详情：",
+          unit: "单价", remove: "移除", decQty: "减少数量", incQty: "增加数量",
+          total: "合计", totalUsd: "合计（美元）", checkout: "去结账", goCheckout: "去结账 · 去付款",
+          coTitle: "结账 — 去购买页面付款",
+          coText: "本站不收款。每件商品各有自己的 Lolobuy / 微店购买页面，逐件点开付款就行，付款后按对应页面的流程发货寄给你。",
+          payNow: "去付款 ↗",
+          cartEmptyBig: "购物车是空的",
+          cartEmptyText: "去货架上逛逛，挑中了点「加入购物车」，结账时再一起去购买页面付款。",
+          cartNoteEmpty: "付款在 Lolobuy / 微店完成——每件商品各有自己的购买页面。",
+          cartNote: "合计是购物车里商品的标价总和；运费等其他费用以付款页面为准，下单别忘了用运费券。",
+          toastAdded: "已加入购物车。", toastAddedQty: "已加入购物车（× {n}）。",
+
+
+
+        },
+        en: {
+          docTitle: "13enj!", shopName: "13enj!", tagline: "Handpicked finds · New drops regularly",
+          navAll: "All products", navStores: "Affiliated stores", navLinks: "My links",cart: "Cart",
+          closeCart: "Close cart", close: "Close",
+          h1Upd: "(regularly updated)",
+          subHTML: "Welcome to <strong>13enj!</strong> — what you're looking for is right here, with new pieces added regularly. See something you love? Open its card for the details, add it to your cart or buy it in one tap — checkout runs through <strong>Lolobuy / Weidian</strong> and your order ships straight to your door.",
+          couponBig: "Lolobuy $500 shipping coupons",
+          couponNote: "New here? Claim your shipping-coupon pack and save on delivery when you order through Lolobuy.",
+          couponPending: "Claim coupons ↗", couponClaim: "Claim coupons ↗",
+          allLinksCap: "All my links",
+          searchPh: "Search brand, product, style…", searchAria: "Search products",
+          subtypeAria: "Filter by style", groupAria: "Grouping",
+          fBrand: "Brand", fSubtype: "Style", fGroup: "Group by",
+          gNone: "No grouping", gBrand: "Group by brand", gSubtype: "Group by style",
+          allBrands: "All brands", allStyles: "All styles", uncat: "Uncategorized",
+          groupCount: "{n} items", countItems: "{n} items",
+          noMatch: "No products match the current filters.",
+          emptyBig: "New arrivals coming soon",
+          emptyText: "The shelf is being stocked right now — a fresh batch of finds is on its way. Check back in a few days so you don't miss the first drop.",
+          howTitle: "How to buy", howSteps: "Three steps:",
+          how1: "Browse the shelf and pick what you like — open a product page for the details, or add it straight to your cart.",
+          how2: "Check out and pay: each item opens its own Lolobuy / Weidian purchase page — pay there to place your order.",
+          how3: "Sit back and wait for delivery: your order is packed and shipped straight to your door.",
+          footTag: "New finds added regularly",
+          footHTML: "Everything here is ordered and paid for through Lolobuy / Weidian: every Buy button opens that item's own purchase page, and payment, shipping and after-sales follow that platform's terms. Prices may change as items sell out or new stock arrives.",
+
+
+lblSeason: "Series / SKU",
+          specLabel: "Specs", lblGrade: "Stock status",
+          gradeA: "Well stocked", gradeB: "In stock", gradeC: "Pre-order",
+
+
+          lblRaw: "Weidian / original link",lblNote: "Note", lblCheck: "Description",
+
+
+
+
+
+
+
+
+
+
+
+          dStatus: "Status", openRaw: "Open original link ↗",
+          pdNoDesc: "No extra details for this item yet — everything you need is on its card.",
+          usdSeller: "USD · Seller's price", usd: "USD", qty: "Quantity", qtyWord: "Qty",
+          buyNow: "Buy now ↗", addToCart: "Add to cart",
+          noPhoto: "No photo", fresh: "New", viewDetails: "View details: ",
+          unit: "Unit", remove: "Remove", decQty: "Decrease quantity", incQty: "Increase quantity",
+          total: "Total", totalUsd: "Total (USD)", checkout: "Checkout", goCheckout: "Checkout · Pay",
+          coTitle: "Checkout — pay on the buy pages",
+          coText: "This site doesn't take payments. Each item has its own Lolobuy / Weidian buy page — open them one by one to pay, and each item ships following that page's process.",
+          payNow: "Pay ↗",
+          cartEmptyBig: "Your cart is empty",
+          cartEmptyText: "Browse the shelf, add what you like to the cart, and pay on the buy pages at checkout.",
+          cartNoteEmpty: "Payment happens on Lolobuy / Weidian — each item has its own buy page.",
+          cartNote: "The total is the sum of the listed prices in your cart; shipping and other fees follow the payment page — don't forget your shipping coupons when you order.",
+          toastAdded: "Added to cart.", toastAddedQty: "Added to cart (× {n}).",
+
+
+
+        },
+        ru: {
+          docTitle: "13enj!", shopName: "13enj!", tagline: "Отборные находки · Регулярные новинки",
+          navAll: "Все товары", navStores: "Магазины-партнёры", navLinks: "Мои ссылки",cart: "Корзина",
+          closeCart: "Закрыть корзину", close: "Закрыть",
+          h1Upd: "(обновляется)",
+          subHTML: "Добро пожаловать в <strong>13enj!</strong>! Здесь есть то, что вы ищете, новинки появляются регулярно. Понравился товар? Откройте его карточку, чтобы посмотреть детали, добавьте в корзину или купите сразу — оплата через <strong>Lolobuy / Weidian</strong>, а заказ доставят прямо к вашей двери.",
+          couponBig: "Купоны Lolobuy на доставку — $500",
+          couponNote: "Вы здесь впервые? Заберите набор купонов на доставку и экономьте при заказе через Lolobuy.",
+          couponPending: "Получить купоны ↗", couponClaim: "Получить купоны ↗",
+          allLinksCap: "Все мои ссылки",
+          searchPh: "Поиск: бренд, товар, стиль…", searchAria: "Поиск товаров",
+          subtypeAria: "Фильтр по подтипу", groupAria: "Группировка",
+          fBrand: "Бренд", fSubtype: "Подтип", fGroup: "Группировка",
+          gNone: "Без группировки", gBrand: "По бренду", gSubtype: "По подтипу",
+          allBrands: "Все бренды", allStyles: "Все подтипы", uncat: "Без категории",
+          groupCount: "{n} шт.", countItems: "{n} шт.",
+          noMatch: "По текущим фильтрам ничего не нашлось.",
+          emptyBig: "Новинки уже в пути",
+          emptyText: "Полка сейчас пополняется — свежая партия находок уже на подходе. Загляните через пару дней, чтобы не пропустить первый дроп.",
+          howTitle: "Как купить", howSteps: "Три шага:",
+          how1: "Выберите товары на полке — откройте страницу товара, чтобы посмотреть детали, или сразу добавьте в корзину.",
+          how2: "Оформите заказ и оплатите: для каждого товара откроется его страница покупки в Lolobuy / Weidian — оплатите там.",
+          how3: "Дождитесь доставки — заказ упакуют и привезут прямо к вашей двери.",
+          footTag: "Новинки добавляются регулярно",
+          footHTML: "Все товары здесь заказываются и оплачиваются через Lolobuy / Weidian: каждая кнопка покупки открывает страницу именно этого товара, а оплата, доставка и возврат регулируются условиями соответствующей платформы. Цены могут меняться по мере продажи товаров и поступления новых.",
+
+
+lblSeason: "Серия / артикул",
+          specLabel: "Характеристики", lblGrade: "Статус наличия",
+          gradeA: "Много в наличии", gradeB: "В наличии", gradeC: "Предзаказ",
+
+
+          lblRaw: "Weidian / исходная ссылка",lblNote: "Примечание", lblCheck: "Описание товара",
+
+
+
+
+
+
+
+
+
+
+
+          dStatus: "Статус", openRaw: "Открыть исходную ссылку ↗",
+          pdNoDesc: "Подробностей по этому товару пока нет — вся информация указана на его карточке.",
+          usdSeller: "USD · Цена продавца", usd: "USD", qty: "Количество", qtyWord: "Кол-во",
+          buyNow: "Купить ↗", addToCart: "В корзину",
+          noPhoto: "Нет фото", fresh: "Новинка", viewDetails: "Подробнее: ",
+          unit: "За шт.", remove: "Убрать", decQty: "Уменьшить количество", incQty: "Увеличить количество",
+          total: "Итого", totalUsd: "Итого (USD)", checkout: "Оформить заказ", goCheckout: "Оформить · Оплатить",
+          coTitle: "Оформление — оплата на страницах покупки",
+          coText: "Этот сайт не принимает оплату. У каждого товара своя страница покупки в Lolobuy / Weidian — откройте их по одной и оплатите; отправка — по процедуре соответствующей страницы.",
+          payNow: "Оплатить ↗",
+          cartEmptyBig: "Корзина пуста",
+          cartEmptyText: "Загляните на полку, добавьте понравившееся в корзину, а при оформлении оплатите на страницах покупки.",
+          cartNoteEmpty: "Оплата проходит в Lolobuy / Weidian — у каждого товара своя страница покупки.",
+          cartNote: "Итого — сумма цен товаров в корзине; доставка и прочие сборы указаны на странице оплаты. Не забудьте купоны на доставку при заказе.",
+          toastAdded: "Добавлено в корзину.", toastAddedQty: "Добавлено в корзину (× {n}).",
+
+
+
+        },
+        es: {
+          docTitle: "13enj!", shopName: "13enj!", tagline: "Selección especial · Novedades constantes",
+          navAll: "Todos los productos", navStores: "Tiendas asociadas", navLinks: "Mis enlaces",cart: "Carrito",
+          closeCart: "Cerrar el carrito", close: "Cerrar",
+          h1Upd: "(actualización continua)",
+          subHTML: "¡Bienvenido a <strong>13enj!</strong>! Aquí está lo que buscas, con novedades constantes. ¿Te gusta algo? Abre su tarjeta para ver los detalles, añádelo al carrito o cómpralo al instante: el pago se hace en <strong>Lolobuy / Weidian</strong> y tu pedido llega hasta tu puerta.",
+          couponBig: "Cupones de envío Lolobuy de $500",
+          couponNote: "¿Es tu primera vez aquí? Reclama tu paquete de cupones de envío y ahorra en la entrega al pedir por Lolobuy.",
+          couponPending: "Reclamar cupones ↗", couponClaim: "Reclamar cupones ↗",
+          allLinksCap: "Todos mis enlaces",
+          searchPh: "Buscar marca, producto, estilo…", searchAria: "Buscar productos",
+          subtypeAria: "Filtrar por estilo", groupAria: "Agrupación",
+          fBrand: "Marca", fSubtype: "Estilo", fGroup: "Agrupar",
+          gNone: "Sin agrupar", gBrand: "Por marca", gSubtype: "Por estilo",
+          allBrands: "Todas las marcas", allStyles: "Todos los estilos", uncat: "Sin categoría",
+          groupCount: "{n} productos", countItems: "{n} productos",
+          noMatch: "Ningún producto coincide con los filtros actuales.",
+          emptyBig: "Novedades en camino",
+          emptyText: "Estamos preparando el estante: una nueva tanda de productos está por llegar. Vuelve en unos días para no perderte el primer lanzamiento.",
+          howTitle: "Cómo comprar", howSteps: "Tres pasos:",
+          how1: "Elige tus productos en el estante: abre la página de cada uno para ver los detalles o añádelo directamente al carrito.",
+          how2: "Finaliza la compra y paga: cada producto abre su propia página de compra en Lolobuy / Weidian; paga ahí para hacer tu pedido.",
+          how3: "Recibe tu pedido: lo preparamos y te lo enviamos hasta tu puerta.",
+          footTag: "Novedades con frecuencia",
+          footHTML: "Todos los productos se piden y se pagan a través de Lolobuy / Weidian: cada botón de compra abre la página de ese producto, y el pago, el envío y la posventa siguen las condiciones de esa plataforma. Los precios pueden cambiar cuando un producto se agota o llega stock nuevo.",
+
+
+lblSeason: "Serie / referencia",
+          specLabel: "Especificaciones", lblGrade: "Estado",
+          gradeA: "Stock amplio", gradeB: "En stock", gradeC: "Preventa",
+
+
+          lblRaw: "Weidian / enlace original",lblNote: "Nota", lblCheck: "Descripción del producto",
+
+
+
+
+
+
+
+
+
+
+
+          dStatus: "Estado", openRaw: "Abrir enlace original ↗",
+          pdNoDesc: "Este producto aún no tiene detalles extra: todo lo que necesitas está en su tarjeta.",
+          usdSeller: "USD · Precio del vendedor", usd: "USD", qty: "Cantidad", qtyWord: "Cant.",
+          buyNow: "Comprar ↗", addToCart: "Añadir al carrito",
+          noPhoto: "Sin foto", fresh: "Nuevo", viewDetails: "Ver detalles: ",
+          unit: "Unidad", remove: "Quitar", decQty: "Reducir cantidad", incQty: "Aumentar cantidad",
+          total: "Total", totalUsd: "Total (USD)", checkout: "Ir a pagar", goCheckout: "Finalizar · Pagar",
+          coTitle: "Pago — paga en las páginas de compra",
+          coText: "Este sitio no cobra. Cada producto tiene su propia página de compra en Lolobuy / Weidian: ábrelas una a una para pagar, y cada producto se envía según el proceso de su página.",
+          payNow: "Pagar ↗",
+          cartEmptyBig: "Tu carrito está vacío",
+          cartEmptyText: "Pasea por el estante, añade lo que te guste al carrito y paga en las páginas de compra al finalizar la compra.",
+          cartNoteEmpty: "El pago se hace en Lolobuy / Weidian: cada producto tiene su propia página de compra.",
+          cartNote: "El total es la suma de los precios indicados en tu carrito; el envío y otros cargos dependen de la página de pago. No olvides usar tus cupones de envío al pedir.",
+          toastAdded: "Añadido al carrito.", toastAddedQty: "Añadido al carrito (× {n}).",
+
+
+
+        }
+      };
+      function t(k) {
+        var d = I18N[LANG] || I18N.zh;
+        return d[k] != null ? d[k] : (I18N.zh[k] != null ? I18N.zh[k] : k);
+      }
+      function gradeLabel(g) {
+        if (!g) return "";
+        var v = t("grade" + g);
+        return v === "grade" + g ? g : v;
+      }
+      var state = { query: "", brand: "", subtype: "", groupBy: "none" };
+
+      /* Cart: { productId: qty } — lives in memory for this visit only.
+         Checkout never happens here: each product is paid for on its own
+         Lolobuy page, opened from the cart's checkout list. */
+      var cart = {};
+
+      var gridEl = document.getElementById("grid");
+      var emptyShelf = document.getElementById("emptyShelf");
+      var noMatch = document.getElementById("noMatch");
+      var listCount = document.getElementById("listCount");
+      var brandChipsEl = document.getElementById("brandChips");
+      var subtypeSel = document.getElementById("subtypeFilter");
+      var groupSel = document.getElementById("groupBy");
+      var toast = document.getElementById("toast");
+      var toastTimer = null;
+
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 3400);
+      }
+
+      function esc(s) {
+        return String(s == null ? "" : s)
+          .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+      }
+
+      function uniq(list) {
+        var seen = {}, out = [];
+        list.forEach(function (v) { if (v && !seen[v]) { seen[v] = 1; out.push(v); } });
+        return out;
+      }
+
+      function money(n) { return "$" + Number(n).toLocaleString(LOCALES[LANG] || "zh-CN"); }
+
+      function findProduct(id) {
+        return PRODUCTS.find(function (p) { return p.id === id; }) || null;
+      }
+
+      function buyHTML(item, cls) {
+        return '<a class="buy ' + (cls || "") + '" href="' + esc(item.url) + '" target="_blank" rel="noopener noreferrer">' + esc(t("buyNow")) + "</a>";
+      }
+
+      /* ---------- product cards ---------- */
+      function cardHTML(item) {
+        var media = item.img
+          ? '<img src="' + esc(item.img) + '" alt="' + esc(item.brand + " — " + item.title) + '" loading="lazy" />'
+          : '<div class="noimg">' + esc(item.brand) + "<br/>" + esc(t("noPhoto")) + "</div>";
+        var metaBits = [];
+        if (item.subtype) metaBits.push(esc(item.subtype));
+        metaBits.push(esc(item.size || (t("specLabel") + " —")));
+        metaBits.push(esc(gradeLabel(item.grade)));
+        return (
+          '<article class="card">' +
+            '<button class="imgwrap" type="button" data-pd="' + esc(item.id) + '" aria-label="' + esc(t("viewDetails") + item.title) + '">' +
+              media + (item.fresh ? '<span class="fresh">' + esc(t("fresh")) + "</span>" : "") +
+            "</button>" +
+            '<div class="cbody">' +
+              '<div class="brandline"><span class="brand">' + esc(item.brand) + "</span>" +
+              (item.season ? '<span class="season">' + esc(item.season) + "</span>" : "") + "</div>" +
+              '<button class="pname" type="button" data-pd="' + esc(item.id) + '">' + esc(item.title) + "</button>" +
+              '<div class="meta">' + metaBits.join(" · ") + "</div>" +
+              '<div class="pricerow"><span class="price">' + money(item.price) + "</span><small>" + esc(t("usd")) + "</small></div>" +
+              '<div class="actions">' +
+                '<button class="addcart" type="button" data-add="' + esc(item.id) + '">' + esc(t("addToCart")) + "</button>" +
+                buyHTML(item) +
+              "</div>" +
+            "</div>" +
+          "</article>"
+        );
+      }
+
+      function matches(item, q) {
+        if (state.brand && item.brand !== state.brand) return false;
+        if (state.subtype && item.subtype !== state.subtype) return false;
+        if (!q) return true;
+        var hay = (item.brand + " " + (item.subtype || "") + " " + item.title + " " + (item.season || "") + " " + (item.note || "")).toLowerCase();
+        return hay.indexOf(q) !== -1;
+      }
+
+      function renderFilters() {
+        var brands = uniq(PRODUCTS.map(function (f) { return f.brand; }));
+        if (state.brand && brands.indexOf(state.brand) === -1) state.brand = "";
+        var chips = ['<button type="button" class="fchip' + (state.brand === "" ? " on" : "") + '" data-brand="">' + esc(t("allBrands")) + "</button>"];
+        brands.forEach(function (b) {
+          chips.push('<button type="button" class="fchip' + (state.brand === b ? " on" : "") + '" data-brand="' + esc(b) + '">' + esc(b) + "</button>");
+        });
+        brandChipsEl.innerHTML = chips.join("");
+        brandChipsEl.querySelectorAll("[data-brand]").forEach(function (el) {
+          el.addEventListener("click", function () { state.brand = el.getAttribute("data-brand"); render(); });
+        });
+
+        var subs = uniq(PRODUCTS.map(function (f) { return f.subtype; }));
+        if (state.subtype && subs.indexOf(state.subtype) === -1) state.subtype = "";
+        var opts = ['<option value="">' + esc(t("allStyles")) + "</option>"];
+        subs.forEach(function (s) {
+          opts.push('<option value="' + esc(s) + '"' + (state.subtype === s ? " selected" : "") + ">" + esc(s) + "</option>");
+        });
+        subtypeSel.innerHTML = opts.join("");
+      }
+
+      function render() {
+        renderFilters();
+        var q = state.query.trim().toLowerCase();
+        var items = PRODUCTS.filter(function (it) { return matches(it, q); });
+
+        if (PRODUCTS.length === 0) {
+          gridEl.innerHTML = "";
+          emptyShelf.hidden = false;
+          noMatch.classList.remove("show");
+        } else {
+          emptyShelf.hidden = true;
+          if (items.length === 0) {
+            gridEl.innerHTML = "";
+            noMatch.classList.add("show");
+          } else {
+            noMatch.classList.remove("show");
+            if (state.groupBy === "none") {
+              gridEl.innerHTML = items.map(cardHTML).join("");
+            } else {
+              var key = state.groupBy === "brand" ? "brand" : "subtype";
+              var order = [], groups = {};
+              items.forEach(function (it) {
+                var g = it[key] || t("uncat");
+                if (!groups[g]) { groups[g] = []; order.push(g); }
+                groups[g].push(it);
+              });
+              gridEl.innerHTML = order.map(function (g) {
+                return (
+                  '<div class="grouphead"><span>' + esc(g) + '</span><span class="gcount">' + esc(t("groupCount").replace("{n}", groups[g].length)) + "</span></div>" +
+                  groups[g].map(cardHTML).join("")
+                );
+              }).join("");
+            }
+          }
+        }
+        listCount.textContent = PRODUCTS.length ? t("countItems").replace("{n}", items.length) : "";
+
+        gridEl.querySelectorAll("[data-pd]").forEach(function (el) {
+          el.addEventListener("click", function () { openDetail(el.getAttribute("data-pd")); });
+        });
+        gridEl.querySelectorAll("[data-add]").forEach(function (el) {
+          el.addEventListener("click", function () {
+            addToCart(el.getAttribute("data-add"), 1);
+            showToast(t("toastAdded"));
+          });
+        });
+      }
+
+      document.getElementById("searchInput").addEventListener("input", function (e) {
+        state.query = e.target.value;
+        render();
+      });
+      subtypeSel.addEventListener("change", function () { state.subtype = subtypeSel.value; render(); });
+      groupSel.addEventListener("change", function () { state.groupBy = groupSel.value; render(); });
+
+      /* ---------- header promo + links ---------- */
+      function renderHeaderBits() {
+        var slot = document.getElementById("couponSlot");
+        if (COUPON_URL) {
+          slot.outerHTML =
+            '<a class="claim" id="couponSlot" href="' + esc(COUPON_URL) + '" target="_blank" rel="noopener noreferrer">' + esc(t("couponClaim")) + "</a>";
+        } else if (slot.tagName !== "SPAN") {
+          slot.outerHTML = '<span class="pending" id="couponSlot">' + esc(t("couponPending")) + "</span>";
+        } else {
+          slot.textContent = t("couponPending");
+        }
+        var linksEl = document.getElementById("allLinks");
+        var linksBar = document.getElementById("allLinksBar");
+        if (MY_LINKS.length) {
+          linksBar.style.display = "";
+          linksEl.innerHTML = MY_LINKS.map(function (l) {
+            return '<a class="lchip" href="' + esc(l.url) + '" target="_blank" rel="noopener noreferrer">' + esc(l.label) + " ↗</a>";
+          }).join(" ");
+        } else {
+          linksBar.style.display = "none";
+          linksEl.innerHTML = "";
+        }
+      }
+      renderHeaderBits();
+
+      /* ---------- right rail ---------- */
+      function renderRail() {
+        var storeBox = document.getElementById("stores");
+        var storeEl = document.getElementById("storeList");
+        var navLink = document.getElementById("navStoresLink");
+        if (STORES.length) {
+          storeBox.style.display = "";
+          if (navLink) navLink.style.display = "";
+          storeEl.innerHTML = '<ul class="stores">' + STORES.map(function (s) {
+            return '<li><a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer"><span>' + esc(s.name) + '</span><span class="arr">↗</span></a></li>';
+          }).join("") + "</ul>";
+        } else {
+          storeBox.style.display = "none";
+          if (navLink) navLink.style.display = "none";
+          storeEl.innerHTML = "";
+        }
+      }
+      renderRail();
+
+      /* ---------- cart ---------- */
+      var cartPanel = document.getElementById("cartPanel");
+      var cartBody = document.getElementById("cartBody");
+      var cartFoot = document.getElementById("cartFoot");
+      var cartCountEl = document.getElementById("cartCount");
+      var cartHeadCount = document.getElementById("cartHeadCount");
+
+      function cartIds() { return Object.keys(cart).filter(function (id) { return cart[id] > 0 && findProduct(id); }); }
+      function cartQtyTotal() { return cartIds().reduce(function (s, id) { return s + cart[id]; }, 0); }
+      function cartTotal() { return cartIds().reduce(function (s, id) { return s + findProduct(id).price * cart[id]; }, 0); }
+
+      function addToCart(id, qty) {
+        if (!findProduct(id)) return;
+        cart[id] = (cart[id] || 0) + qty;
+        if (cart[id] <= 0) delete cart[id];
+        renderCart();
+      }
+
+      function openCart() {
+        if (typeof cartPanel.showModal === "function" && !cartPanel.open) cartPanel.showModal();
+      }
+      function closeCart() {
+        if (cartPanel.open) cartPanel.close();
+      }
+      document.getElementById("openCart").addEventListener("click", openCart);
+      document.getElementById("cartClose").addEventListener("click", closeCart);
+      cartPanel.addEventListener("click", function (e) { if (e.target === cartPanel) closeCart(); });
+
+      function renderCart() {
+        var ids = cartIds();
+        var qtyTotal = cartQtyTotal();
+        cartCountEl.textContent = qtyTotal;
+        cartHeadCount.textContent = qtyTotal ? t("countItems").replace("{n}", qtyTotal) : "";
+
+        if (!ids.length) {
+          cartBody.innerHTML =
+            '<div class="cp-empty"><div class="big">' + esc(t("cartEmptyBig")) + "</div>" +
+            "<p>" + esc(t("cartEmptyText")) + "</p></div>";
+          cartFoot.innerHTML =
+            '<div class="cp-total"><span class="tlabel">' + esc(t("total")) + '</span><span class="tval">$0</span></div>' +
+            '<p class="note">' + esc(t("cartNoteEmpty")) + "</p>" +
+            '<button class="checkout-btn" type="button" disabled>' + esc(t("checkout")) + "</button>";
+          return;
+        }
+
+        var rows = ids.map(function (id) {
+          var item = findProduct(id);
+          var qty = cart[id];
+          var media = item.img
+            ? '<img src="' + esc(item.img) + '" alt="' + esc(item.brand + " — " + item.title) + '" loading="lazy" />'
+            : '<div class="noimg">' + esc(item.brand) + "</div>";
+          var metaBits = [];
+          if (item.subtype) metaBits.push(esc(item.subtype));
+          if (item.size) metaBits.push(esc(t("specLabel")) + " " + esc(item.size));
+          metaBits.push(esc(gradeLabel(item.grade)));
+          return (
+            '<div class="crow">' +
+              '<div class="cthumb">' + media + "</div>" +
+              "<div>" +
+                '<div class="cbrand">' + esc(item.brand) + (item.season ? " · " + esc(item.season) : "") + "</div>" +
+                '<div class="cname">' + esc(item.title) + "</div>" +
+                '<div class="cmeta">' + metaBits.join(" · ") + "</div>" +
+                '<div class="cctrl">' +
+                  '<span class="stepper">' +
+                    '<button type="button" data-dec="' + esc(id) + '" aria-label="' + esc(t("decQty")) + '">−</button>' +
+                    '<span class="qv-num">' + qty + "</span>" +
+                    '<button type="button" data-inc="' + esc(id) + '" aria-label="' + esc(t("incQty")) + '">+</button>' +
+                  "</span>" +
+                  '<button class="rm" type="button" data-rm="' + esc(id) + '">' + esc(t("remove")) + "</button>" +
+                "</div>" +
+              "</div>" +
+              '<div class="cline"><div class="cprice">' + money(item.price * qty) + '</div>' +
+              '<div class="cunit">' + esc(t("unit")) + " " + money(item.price) + "</div></div>" +
+            "</div>"
+          );
+        }).join("");
+
+        var checkoutRows = ids.map(function (id) {
+          var item = findProduct(id);
+          var qty = cart[id];
+          return (
+            '<div class="co-row">' +
+              '<div class="coname">' + esc(item.title) + "<span>" + esc(item.brand) + " · " + esc(t("qtyWord")) + " × " + qty + "</span></div>" +
+              '<span class="coprice">' + money(item.price * qty) + "</span>" +
+              '<a class="buy" href="' + esc(item.url) + '" target="_blank" rel="noopener noreferrer">' + esc(t("payNow")) + "</a>" +
+            "</div>"
+          );
+        }).join("");
+
+        cartBody.innerHTML =
+          rows +
+          '<div class="cp-checkout" id="checkoutZone">' +
+            "<h4>" + esc(t("coTitle")) + "</h4>" +
+            "<p>" + esc(t("coText")) + "</p>" +
+            checkoutRows +
+          "</div>";
+
+        cartFoot.innerHTML =
+          '<div class="cp-total"><span class="tlabel">' + esc(t("totalUsd")) + '</span><span class="tval">' + money(cartTotal()) + "</span></div>" +
+          '<p class="note">' + esc(t("cartNote")) + "</p>" +
+          '<button class="checkout-btn" type="button" id="goCheckout">' + esc(t("goCheckout")) + "</button>";
+
+        cartBody.querySelectorAll("[data-inc]").forEach(function (el) {
+          el.addEventListener("click", function () { addToCart(el.getAttribute("data-inc"), 1); });
+        });
+        cartBody.querySelectorAll("[data-dec]").forEach(function (el) {
+          el.addEventListener("click", function () { addToCart(el.getAttribute("data-dec"), -1); });
+        });
+        cartBody.querySelectorAll("[data-rm]").forEach(function (el) {
+          el.addEventListener("click", function () { delete cart[el.getAttribute("data-rm")]; renderCart(); });
+        });
+        document.getElementById("goCheckout").addEventListener("click", function () {
+          document.getElementById("checkoutZone").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+
+      /* ---------- dialogs ---------- */
+      var pdDlg = document.getElementById("pdDlg");
+      document.querySelectorAll("[data-close]").forEach(function (btn) {
+        btn.addEventListener("click", function () { btn.closest("dialog").close(); });
+      });
+      [pdDlg].forEach(function (d) {
+        d.addEventListener("click", function (e) { if (e.target === d) d.close(); });
+      });
+
+      /* ---------- product detail ---------- */
+      var pdCurrent = null;
+      var pdQty = 1;
+      var pdQtyEl = document.getElementById("pdQty");
+
+      function fillDetail(item) {
+        document.getElementById("pdBrand").textContent = item.brand + (item.season ? " · " + item.season : "");
+        document.getElementById("pdTitle").textContent = item.title;
+        document.getElementById("pdSubtype").textContent = item.subtype || "—";
+        document.getElementById("pdSeason").textContent = item.season || "—";
+        document.getElementById("pdSize").textContent = item.size || "—";
+        document.getElementById("pdGrade").textContent = gradeLabel(item.grade) || item.grade || "—";
+        document.getElementById("pdRaw").innerHTML = item.rawUrl
+          ? '<a href="' + esc(item.rawUrl) + '" target="_blank" rel="noopener noreferrer">' + esc(t("openRaw")) + "</a>"
+          : "—";
+        document.getElementById("pdNote").textContent = item.note || "—";
+        document.getElementById("pdCheck").textContent = item.check || t("pdNoDesc");
+        document.getElementById("pdPrice").textContent = money(item.price);
+        document.getElementById("pdImg").innerHTML = item.img
+          ? '<img src="' + esc(item.img) + '" alt="' + esc(item.brand + " — " + item.title) + '" />'
+          : '<div class="noimg">' + esc(item.brand) + "<br/>" + esc(t("noPhoto")) + "</div>";
+        document.getElementById("pdBuy").innerHTML = buyHTML(item);
+      }
+
+      function openDetail(id) {
+        var item = findProduct(id);
+        if (!item) return;
+        pdCurrent = item;
+        pdQty = 1;
+        pdQtyEl.textContent = "1";
+        fillDetail(item);
+        if (typeof pdDlg.showModal === "function" && !pdDlg.open) pdDlg.showModal();
+      }
+      document.getElementById("pdMinus").addEventListener("click", function () {
+        if (pdQty > 1) { pdQty -= 1; pdQtyEl.textContent = pdQty; }
+      });
+      document.getElementById("pdPlus").addEventListener("click", function () {
+        pdQty += 1; pdQtyEl.textContent = pdQty;
+      });
+      document.getElementById("pdAddCart").addEventListener("click", function () {
+        if (!pdCurrent) return;
+        addToCart(pdCurrent.id, pdQty);
+        pdDlg.close();
+        showToast(t("toastAddedQty").replace("{n}", pdQty));
+        openCart();
+      });
+
+      /* ---------- language switching ---------- */
+      function applyStatic() {
+        document.title = t("docTitle");
+        document.documentElement.lang = LOCALES[LANG] || "zh-CN";
+        document.querySelectorAll("[data-i18n]").forEach(function (el) {
+          el.textContent = t(el.getAttribute("data-i18n"));
+        });
+        document.querySelectorAll("[data-i18n-html]").forEach(function (el) {
+          el.innerHTML = t(el.getAttribute("data-i18n-html"));
+        });
+        document.querySelectorAll("[data-i18n-ph]").forEach(function (el) {
+          el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph")));
+        });
+        document.querySelectorAll("[data-i18n-aria]").forEach(function (el) {
+          el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria")));
+        });
+        document.querySelectorAll(".langsw [data-lang]").forEach(function (b) {
+          b.classList.toggle("on", b.getAttribute("data-lang") === LANG);
+        });
+      }
+      function setLang(l) {
+        if (!I18N[l] || l === LANG) return;
+        LANG = l;
+        applyStatic();
+        renderHeaderBits();
+        renderRail();
+        render();
+        renderCart();
+        if (pdDlg.open && pdCurrent) fillDetail(pdCurrent);
+      }
+      document.querySelectorAll(".langsw [data-lang]").forEach(function (b) {
+        b.addEventListener("click", function () { setLang(b.getAttribute("data-lang")); });
+      });
+
+      applyStatic();
+      render();
+      renderCart();
+    </script>
+  </body>
+</html>
