@@ -447,6 +447,13 @@
       .pd-specs dt { font-family: "Cinzel", serif; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); padding-top: 3px; }
       .pd-specs dd { margin: 0; font-weight: 600; word-break: break-all; }
       .pd-specs dd a { color: var(--red-ink); }
+      .sizechart { border-top: 1px dashed var(--line-strong); padding-top: 11px; }
+      .sizechart b { color: var(--ink); font-family: "Cinzel", serif; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+      .sizechart table { width: 100%; border-collapse: collapse; font-size: 15px; text-align: center; }
+      .sizechart th { font-family: "Cinzel", serif; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: var(--ink-faint); padding: 4px 2px; border-bottom: 1px solid var(--line-strong); }
+      .sizechart td { padding: 5px 2px; border-bottom: 1px solid #262626; }
+      .sizechart td:first-child { font-weight: 700; }
+      .sizechart small { display: block; margin-top: 6px; font-size: 13px; color: var(--ink-faint); }
       .pd-body .check { font-size: 16px; line-height: 1.65; color: var(--ink-soft); border-top: 1px dashed var(--line-strong); padding-top: 11px; }
       .pd-body .check b { color: var(--ink); font-family: "Cinzel", serif; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; display: block; margin-bottom: 4px; }
       .pd-foot { margin-top: auto; padding-top: 14px; }
@@ -701,6 +708,7 @@
             <dt data-i18n="lblRaw">微店 / 原始链接</dt><dd id="pdRaw"></dd>
             <dt data-i18n="lblNote">备注</dt><dd id="pdNote"></dd>
           </dl>
+          <div class="sizechart" id="pdChart" hidden></div>
           <div class="check"><b data-i18n="lblCheck">商品说明</b><span id="pdCheck"></span></div>
           <div class="pd-foot">
             <div class="price"><span id="pdPrice"></span><small data-i18n="usdSeller">美元 · 卖家定价</small></div>
@@ -758,6 +766,7 @@
       "es": "Chaqueta con capucha Black Tribal Heart original estilo Number (N)ine AW04"
     },
     "size": "S / M / L / XL",
+    "sizeChart": [["S", 52, 64, 45, 75], ["M", 56, 68, 47, 76], ["L", 60, 72, 49, 77], ["XL", 64, 76, 51, 78]],
     "grade": "B",
     "price": 65,
     "cny": 400,
@@ -1419,6 +1428,23 @@ lblSeason: "Serie / referencia",
           ? '<a href="' + esc(item.rawUrl) + '" target="_blank" rel="noopener noreferrer">' + esc(t("openRaw")) + "</a>"
           : "—";
         document.getElementById("pdNote").textContent = loc(item.note) || "—";
+        var SC = {
+          zh: ["尺码表（厘米）", "尺码", "胸围", "衣长", "肩宽", "袖长", "平铺手工测量，误差 1–3 厘米"],
+          en: ["Size chart (cm)", "Size", "Chest", "Length", "Shoulder", "Sleeve", "Measured flat by hand, allow 1–3 cm difference"],
+          ru: ["Таблица размеров (см)", "Размер", "Грудь", "Длина", "Плечи", "Рукав", "Замеры вручную, погрешность 1–3 см"],
+          es: ["Guía de tallas (cm)", "Talla", "Pecho", "Largo", "Hombros", "Manga", "Medidas a mano, margen de 1–3 cm"]
+        };
+        var chartEl = document.getElementById("pdChart");
+        if (item.sizeChart && item.sizeChart.length) {
+          var L = SC[LANG] || SC.en;
+          var rowsH = item.sizeChart.map(function (r) {
+            return "<tr>" + r.map(function (c) { return "<td>" + esc(String(c)) + "</td>"; }).join("") + "</tr>";
+          }).join("");
+          chartEl.innerHTML = "<b>" + esc(L[0]) + "</b><table><thead><tr>" +
+            L.slice(1, 6).map(function (x) { return "<th>" + esc(x) + "</th>"; }).join("") +
+            "</tr></thead><tbody>" + rowsH + "</tbody></table><small>" + esc(L[6]) + "</small>";
+          chartEl.hidden = false;
+        } else { chartEl.innerHTML = ""; chartEl.hidden = true; }
         document.getElementById("pdCheck").textContent = item.check || t("pdNoDesc");
         document.getElementById("pdPrice").textContent = money(item.price);
         document.getElementById("pdImg").innerHTML = item.img
