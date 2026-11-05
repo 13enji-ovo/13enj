@@ -549,19 +549,26 @@
         width: min(430px, 100vw); max-width: 100vw;
         border: 0; border-left: 1px solid #383838; border-radius: 0;
         background: linear-gradient(180deg, #101010, #080808);
+        overflow: hidden;
       }
       dialog.cartdlg[open] { display: flex; flex-direction: column; animation: slidein 0.2s ease; }
       @keyframes slidein { from { transform: translateX(36px); opacity: 0.4; } to { transform: none; opacity: 1; } }
       .cp-head {
-        display: flex; align-items: center; gap: 10px; padding: 17px 18px;
+        display: flex; align-items: center; gap: 10px;
+        flex-shrink: 0; position: relative; z-index: 2;
+        padding: max(17px, env(safe-area-inset-top, 0px)) 18px 17px;
         border-bottom: 3px double var(--blood);
+        background: #101010;
       }
       .cp-head h3 {
         margin: 0; font-family: "Cinzel Decorative", "Cinzel", serif;
         font-size: 20px; font-weight: 900; letter-spacing: 0.05em;
       }
       .cp-head .cnt { font-family: "Cinzel", serif; font-size: 11.5px; font-weight: 500; color: var(--ink-faint); }
-      .cp-body { flex: 1; overflow-y: auto; padding: 6px 18px 18px; }
+      .cp-body {
+        flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+        padding: 16px 18px 20px; scroll-padding-top: 12px;
+      }
       .cp-empty { padding: 38px 6px; text-align: center; color: var(--ink-soft); font-size: 16px; line-height: 1.65; }
       .cp-empty .big { font-family: "Cinzel", serif; font-size: 18px; font-weight: 900; letter-spacing: 0.04em; color: var(--ink); }
       .crow {
@@ -593,14 +600,37 @@
       .cp-checkout h4 { margin: 0 0 4px; font-family: "Cinzel", serif; font-size: 13.5px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
       .cp-checkout p { margin: 0 0 10px; font-size: 15px; line-height: 1.6; color: var(--ink-soft); }
       .co-row {
-        display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--line);
+        display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px dashed var(--line);
       }
       .co-row:last-of-type { border-bottom: 0; }
-      .co-row .coname { flex: 1; min-width: 0; font-size: 15.5px; font-weight: 600; line-height: 1.4; }
+      .co-row.is-next { background: rgba(139, 92, 246, 0.08); margin: 0 -10px; padding-left: 10px; padding-right: 10px; border-radius: 2px; }
+      .co-row.is-done .coname { color: var(--ink-soft); }
+      .co-row .costep {
+        flex: none; width: 26px; height: 26px; border-radius: 50%;
+        display: grid; place-items: center;
+        font-family: "Cinzel", serif; font-size: 11px; font-weight: 900;
+        border: 1px solid var(--line-strong); color: var(--ink-faint); background: #0c0c0c;
+      }
+      .co-row.is-next .costep { border-color: var(--violet); color: #e9e9e9; background: #1a1424; }
+      .co-row.is-done .costep { border-color: #3d6b3d; color: #b7e0b7; background: #101810; }
+      .co-row .coname { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; line-height: 1.4; }
       .co-row .coname span { display: block; font-family: "Cinzel", serif; font-size: 9.5px; font-weight: 500; letter-spacing: 0.06em; color: var(--ink-faint); margin-top: 2px; }
       .co-row .coprice { font-family: "Cinzel", serif; font-size: 14px; font-weight: 900; white-space: nowrap; }
       .co-row .buy { flex: none; padding: 9px 12px; font-size: 11px; }
-      .cp-foot { border-top: 3px double var(--blood); padding: 15px 18px 18px; background: #090909; }
+      .co-row .buy.is-done { opacity: 0.7; }
+      .cp-checkout .co-progress {
+        margin: 0 0 10px; font-family: "Cinzel", serif; font-size: 11px; font-weight: 700;
+        letter-spacing: 0.08em; text-transform: uppercase; color: var(--violet-soft);
+      }
+      .copy-links-btn {
+        width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        background: transparent; color: #d8d8d8; border: 1px dashed #454545; border-radius: 2px;
+        font-family: "Cinzel", serif; font-weight: 700; font-size: 12.5px; letter-spacing: 0.1em;
+        text-transform: uppercase; padding: 13px 16px; margin-top: 4px;
+      }
+      .copy-links-btn:hover { border-color: var(--violet); color: #ededed; }
+      .copy-links-btn:active { transform: translateY(1px); }
+      .cp-foot { flex-shrink: 0; border-top: 3px double var(--blood); padding: 15px 18px max(18px, env(safe-area-inset-bottom, 0px)); background: #090909; }
       .cp-total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
       .cp-total .tlabel { font-family: "Cinzel", serif; font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); }
       .cp-total .tval { font-family: "Cinzel", serif; font-size: 25px; font-weight: 900; letter-spacing: 0.01em; }
@@ -1053,7 +1083,7 @@
           emptyText: "货架正在备货中，新一批好物马上就来——过几天再来逛逛，别错过第一波上新。",
           howTitle: "购买流程", howSteps: "三步：",
           how1: "在货架上挑货，点开商品看详情，或者直接加进购物车。",
-          how2: "去结账付款：每件商品都会打开对应的 Lolobuy / 微店购买页面，在那边付款下单。",
+          how2: "结账时按顺序打开每件商品的 Lolobuy 购买页付款（代理一次一单）。",
           how3: "等收货：订单打包发出，直接寄到你家门口。",
           footTag: "新品持续上架",
           footHTML: "本站商品通过 Lolobuy / 微店完成下单和付款：每个购买按钮都会打开对应商品的购买页面，付款、物流和售后按对应平台的规则处理。商品售出或补货后，价格可能调整。",
@@ -1083,13 +1113,18 @@ lblSeason: "系列 / 款号",
           noPhoto: "暂无图片", fresh: "新上架", viewDetails: "查看详情：",
           unit: "单价", remove: "移除", decQty: "减少数量", incQty: "增加数量",
           total: "合计", totalUsd: "合计（美元）", checkout: "去结账", goCheckout: "去结账 · 去付款",
-          coTitle: "结账 — 去购买页面付款",
-          coText: "本站不收款。每件商品各有自己的 Lolobuy / 微店购买页面，逐件点开付款就行，付款后按对应页面的流程发货寄给你。",
+          coTitle: "逐件付款",
+          coText: "本站不收款。按顺序打开每件商品的 Lolobuy 页面付款（代理不支持一次付多件）。",
           payNow: "去付款 ↗",
+          payItemOf: "付第 {i} / {n} 件",
+          payDone: "已打开",
+          copyAllLinks: "复制全部链接",
+          toastCopied: "已复制全部购买链接。",
+          toastCopyFail: "复制失败，请手动长按链接。",
           cartEmptyBig: "购物车是空的",
-          cartEmptyText: "去货架上逛逛，挑中了点「加入购物车」，结账时再一起去购买页面付款。",
-          cartNoteEmpty: "付款在 Lolobuy / 微店完成——每件商品各有自己的购买页面。",
-          cartNote: "合计是购物车里商品的标价总和；运费等其他费用以付款页面为准。",
+          cartEmptyText: "去货架上逛逛，挑中了点「加入购物车」，结账时再去购买页面付款。",
+          cartNoteEmpty: "付款在 Lolobuy 完成——每件商品各自打开购买页。",
+          cartNote: "标价合计仅供参考；运费以 Lolobuy 付款页为准。可复制全部链接，粘贴到代理的手动填单/搜索框逐件下单。",
           toastAdded: "已加入购物车。", toastAddedQty: "已加入购物车（× {n}）。",
 
 
@@ -1116,7 +1151,7 @@ lblSeason: "系列 / 款号",
           emptyText: "The shelf is being stocked right now — a fresh batch of finds is on its way. Check back in a few days so you don't miss the first drop.",
           howTitle: "How to buy", howSteps: "Three steps:",
           how1: "Browse the shelf and pick what you like — open a product page for the details, or add it straight to your cart.",
-          how2: "Check out and pay: each item opens its own Lolobuy / Weidian purchase page — pay there to place your order.",
+          how2: "At checkout, open each item's Lolobuy buy page in order and pay there (one item per order on the agent).",
           how3: "Sit back and wait for delivery: your order is packed and shipped straight to your door.",
           footTag: "New finds added regularly",
           footHTML: "Everything here is ordered and paid for through Lolobuy / Weidian: every Buy button opens that item's own purchase page, and payment, shipping and after-sales follow that platform's terms. Prices may change as items sell out or new stock arrives.",
@@ -1146,13 +1181,18 @@ lblSeason: "Series / SKU",
           noPhoto: "No photo", fresh: "New", viewDetails: "View details: ",
           unit: "Unit", remove: "Remove", decQty: "Decrease quantity", incQty: "Increase quantity",
           total: "Total", totalUsd: "Total (USD)", checkout: "Checkout", goCheckout: "Checkout · Pay",
-          coTitle: "Checkout — pay on the buy pages",
-          coText: "This site doesn't take payments. Each item has its own Lolobuy / Weidian buy page — open them one by one to pay, and each item ships following that page's process.",
+          coTitle: "Pay item by item",
+          coText: "This site doesn't take payment. Open each item's Lolobuy page in order — agents don't support paying for multiple items in one link.",
           payNow: "Pay ↗",
+          payItemOf: "Pay {i} of {n}",
+          payDone: "Opened",
+          copyAllLinks: "Copy all links",
+          toastCopied: "All buy links copied.",
+          toastCopyFail: "Copy failed — long-press a link instead.",
           cartEmptyBig: "Your cart is empty",
-          cartEmptyText: "Browse the shelf, add what you like to the cart, and pay on the buy pages at checkout.",
-          cartNoteEmpty: "Payment happens on Lolobuy / Weidian — each item has its own buy page.",
-          cartNote: "The total is the sum of the listed prices in your cart; shipping and other fees follow the payment page.",
+          cartEmptyText: "Browse the shelf, add what you like, then pay on each buy page at checkout.",
+          cartNoteEmpty: "Payment happens on Lolobuy — each item has its own buy page.",
+          cartNote: "Listed total is a guide; shipping is set on Lolobuy. Copy all links to paste into an agent's manual-order / search box one by one.",
           toastAdded: "Added to cart.", toastAddedQty: "Added to cart (× {n}).",
 
 
@@ -1179,7 +1219,7 @@ lblSeason: "Series / SKU",
           emptyText: "Полка сейчас пополняется — свежая партия находок уже на подходе. Загляните через пару дней, чтобы не пропустить первый дроп.",
           howTitle: "Как купить", howSteps: "Три шага:",
           how1: "Выберите товары на полке — откройте страницу товара, чтобы посмотреть детали, или сразу добавьте в корзину.",
-          how2: "Оформите заказ и оплатите: для каждого товара откроется его страница покупки в Lolobuy / Weidian — оплатите там.",
+          how2: "При оформлении откройте страницу Lolobuy каждого товара по очереди и оплатите там (у агента — по одному).",
           how3: "Дождитесь доставки — заказ упакуют и привезут прямо к вашей двери.",
           footTag: "Новинки добавляются регулярно",
           footHTML: "Все товары здесь заказываются и оплачиваются через Lolobuy / Weidian: каждая кнопка покупки открывает страницу именно этого товара, а оплата, доставка и возврат регулируются условиями соответствующей платформы. Цены могут меняться по мере продажи товаров и поступления новых.",
@@ -1209,13 +1249,18 @@ lblSeason: "Серия / артикул",
           noPhoto: "Нет фото", fresh: "Новинка", viewDetails: "Подробнее: ",
           unit: "За шт.", remove: "Убрать", decQty: "Уменьшить количество", incQty: "Увеличить количество",
           total: "Итого", totalUsd: "Итого (USD)", checkout: "Оформить заказ", goCheckout: "Оформить · Оплатить",
-          coTitle: "Оформление — оплата на страницах покупки",
-          coText: "Этот сайт не принимает оплату. У каждого товара своя страница покупки в Lolobuy / Weidian — откройте их по одной и оплатите; отправка — по процедуре соответствующей страницы.",
+          coTitle: "Оплата по одному",
+          coText: "Этот сайт не принимает оплату. Откройте страницу Lolobuy каждого товара по очереди — агенты не дают оплатить несколько позиций одной ссылкой.",
           payNow: "Оплатить ↗",
+          payItemOf: "Оплатить {i} из {n}",
+          payDone: "Открыто",
+          copyAllLinks: "Скопировать все ссылки",
+          toastCopied: "Все ссылки скопированы.",
+          toastCopyFail: "Не удалось скопировать — зажмите ссылку вручную.",
           cartEmptyBig: "Корзина пуста",
-          cartEmptyText: "Загляните на полку, добавьте понравившееся в корзину, а при оформлении оплатите на страницах покупки.",
-          cartNoteEmpty: "Оплата проходит в Lolobuy / Weidian — у каждого товара своя страница покупки.",
-          cartNote: "Итого — сумма цен товаров в корзине; доставка и прочие сборы указаны на странице оплаты.",
+          cartEmptyText: "Загляните на полку, добавьте товары, затем оплатите на страницах покупки.",
+          cartNoteEmpty: "Оплата в Lolobuy — у каждого товара своя страница.",
+          cartNote: "Итого — ориентир; доставка на странице Lolobuy. Скопируйте все ссылки и вставляйте в ручной заказ / поиск агента по одной.",
           toastAdded: "Добавлено в корзину.", toastAddedQty: "Добавлено в корзину (× {n}).",
 
 
@@ -1242,7 +1287,7 @@ lblSeason: "Серия / артикул",
           emptyText: "Estamos preparando el estante: una nueva tanda de productos está por llegar. Vuelve en unos días para no perderte el primer lanzamiento.",
           howTitle: "Cómo comprar", howSteps: "Tres pasos:",
           how1: "Elige tus productos en el estante: abre la página de cada uno para ver los detalles o añádelo directamente al carrito.",
-          how2: "Finaliza la compra y paga: cada producto abre su propia página de compra en Lolobuy / Weidian; paga ahí para hacer tu pedido.",
+          how2: "Al pagar, abre la página Lolobuy de cada producto en orden (el agente cobra de uno en uno).",
           how3: "Recibe tu pedido: lo preparamos y te lo enviamos hasta tu puerta.",
           footTag: "Novedades con frecuencia",
           footHTML: "Todos los productos se piden y se pagan a través de Lolobuy / Weidian: cada botón de compra abre la página de ese producto, y el pago, el envío y la posventa siguen las condiciones de esa plataforma. Los precios pueden cambiar cuando un producto se agota o llega stock nuevo.",
@@ -1272,13 +1317,18 @@ lblSeason: "Serie / referencia",
           noPhoto: "Sin foto", fresh: "Nuevo", viewDetails: "Ver detalles: ",
           unit: "Unidad", remove: "Quitar", decQty: "Reducir cantidad", incQty: "Aumentar cantidad",
           total: "Total", totalUsd: "Total (USD)", checkout: "Ir a pagar", goCheckout: "Finalizar · Pagar",
-          coTitle: "Pago — paga en las páginas de compra",
-          coText: "Este sitio no cobra. Cada producto tiene su propia página de compra en Lolobuy / Weidian: ábrelas una a una para pagar, y cada producto se envía según el proceso de su página.",
+          coTitle: "Pagar uno a uno",
+          coText: "Este sitio no cobra. Abre la página Lolobuy de cada producto en orden — el agente no permite pagar varios ítems con un solo enlace.",
           payNow: "Pagar ↗",
+          payItemOf: "Pagar {i} de {n}",
+          payDone: "Abierto",
+          copyAllLinks: "Copiar todos los enlaces",
+          toastCopied: "Enlaces de compra copiados.",
+          toastCopyFail: "No se pudo copiar — mantén pulsado el enlace.",
           cartEmptyBig: "Tu carrito está vacío",
-          cartEmptyText: "Pasea por el estante, añade lo que te guste al carrito y paga en las páginas de compra al finalizar la compra.",
-          cartNoteEmpty: "El pago se hace en Lolobuy / Weidian: cada producto tiene su propia página de compra.",
-          cartNote: "El total es la suma de los precios indicados en tu carrito; el envío y otros cargos dependen de la página de pago.",
+          cartEmptyText: "Pasea por el estante, añade lo que te guste y paga en cada página de compra.",
+          cartNoteEmpty: "El pago es en Lolobuy: cada producto tiene su propia página.",
+          cartNote: "El total es orientativo; el envío lo marca Lolobuy. Copia todos los enlaces y pégalos uno a uno en el pedido manual / buscador del agente.",
           toastAdded: "Añadido al carrito.", toastAddedQty: "Añadido al carrito (× {n}).",
 
 
@@ -1526,6 +1576,8 @@ lblSeason: "Serie / referencia",
       var cartFoot = document.getElementById("cartFoot");
       var cartCountEl = document.getElementById("cartCount");
       var cartHeadCount = document.getElementById("cartHeadCount");
+      /* Ids the buyer already opened on Lolobuy this session (step checkmarks). */
+      var cartOpened = {};
 
       function cartIds() { return Object.keys(cart).filter(function (id) { return cart[id] > 0 && findProduct(id); }); }
       function cartQtyTotal() { return cartIds().reduce(function (s, id) { return s + cart[id]; }, 0); }
@@ -1536,12 +1588,17 @@ lblSeason: "Serie / referencia",
         if (qty > 0 && _p && _p.soldout) return;
         if (!findProduct(id)) return;
         cart[id] = (cart[id] || 0) + qty;
-        if (cart[id] <= 0) delete cart[id];
+        if (cart[id] <= 0) {
+          delete cart[id];
+          delete cartOpened[id];
+        }
         renderCart();
       }
 
       function openCart() {
         if (typeof cartPanel.showModal === "function" && !cartPanel.open) cartPanel.showModal();
+        /* Keep the list starting at the top so the first item is fully visible. */
+        if (cartBody) cartBody.scrollTop = 0;
       }
       function closeCart() {
         if (cartPanel.open) cartPanel.close();
@@ -1550,6 +1607,40 @@ lblSeason: "Serie / referencia",
       document.getElementById("cartClose").addEventListener("click", closeCart);
       cartPanel.addEventListener("click", function (e) { if (e.target === cartPanel) closeCart(); });
 
+      function buildCartLinksText(ids) {
+        return ids.map(function (id, i) {
+          var item = findProduct(id);
+          var qty = cart[id];
+          var lines = [
+            (i + 1) + ". " + loc(item.title),
+            "   " + t("qtyWord") + ": × " + qty,
+            "   " + t("specLabel") + ": " + (loc(item.size) || "—"),
+            "   " + money(item.price * qty) + " (" + t("unit") + " " + money(item.price) + ")",
+            "   " + (item.url || item.rawUrl || "")
+          ];
+          return lines.join("\n");
+        }).join("\n\n");
+      }
+
+      function copyCartLinks(ids) {
+        var text = buildCartLinksText(ids);
+        function ok() { showToast(t("toastCopied")); }
+        function fail() { showToast(t("toastCopyFail")); }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(ok).catch(fail);
+        } else {
+          try {
+            var ta = document.createElement("textarea");
+            ta.value = text; ta.setAttribute("readonly", "");
+            ta.style.position = "fixed"; ta.style.left = "-9999px";
+            document.body.appendChild(ta); ta.select();
+            var copied = document.execCommand("copy");
+            document.body.removeChild(ta);
+            copied ? ok() : fail();
+          } catch (e) { fail(); }
+        }
+      }
+
       function renderCart() {
         var ids = cartIds();
         var qtyTotal = cartQtyTotal();
@@ -1557,13 +1648,13 @@ lblSeason: "Serie / referencia",
         cartHeadCount.textContent = qtyTotal ? nCount("countItems", qtyTotal) : "";
 
         if (!ids.length) {
+          cartOpened = {};
           cartBody.innerHTML =
             '<div class="cp-empty"><div class="big">' + esc(t("cartEmptyBig")) + "</div>" +
             "<p>" + esc(t("cartEmptyText")) + "</p></div>";
           cartFoot.innerHTML =
             '<div class="cp-total"><span class="tlabel">' + esc(t("total")) + '</span><span class="tval">$0</span></div>' +
-            '<p class="note">' + esc(t("cartNoteEmpty")) + "</p>" +
-            '<button class="checkout-btn" type="button" disabled>' + esc(t("checkout")) + "</button>";
+            '<p class="note">' + esc(t("cartNoteEmpty")) + "</p>";
           return;
         }
 
@@ -1599,14 +1690,30 @@ lblSeason: "Serie / referencia",
           );
         }).join("");
 
-        var checkoutRows = ids.map(function (id) {
+        var nextIdx = -1;
+        for (var ni = 0; ni < ids.length; ni++) {
+          if (!cartOpened[ids[ni]]) { nextIdx = ni; break; }
+        }
+        var doneCount = ids.filter(function (id) { return !!cartOpened[id]; }).length;
+        var progressLabel = doneCount >= ids.length
+          ? t("payDone") + " · " + ids.length + "/" + ids.length
+          : t("payItemOf").replace("{i}", String(nextIdx + 1)).replace("{n}", String(ids.length));
+
+        var checkoutRows = ids.map(function (id, i) {
           var item = findProduct(id);
           var qty = cart[id];
+          var done = !!cartOpened[id];
+          var isNext = i === nextIdx;
+          var cls = "co-row" + (done ? " is-done" : "") + (isNext ? " is-next" : "");
+          var stepMark = done ? "✓" : String(i + 1);
+          var btnLabel = done ? t("payDone") : (isNext ? t("payItemOf").replace("{i}", String(i + 1)).replace("{n}", String(ids.length)) : t("payNow"));
           return (
-            '<div class="co-row">' +
-              '<div class="coname">' + esc(loc(item.title)) + "<span>" + esc(item.brand) + " · " + esc(t("qtyWord")) + " × " + qty + "</span></div>" +
+            '<div class="' + cls + '">' +
+              '<span class="costep" aria-hidden="true">' + stepMark + "</span>" +
+              '<div class="coname">' + esc(loc(item.title)) + "<span>" + esc(item.brand) + " · " + esc(t("qtyWord")) + " × " + qty +
+                (loc(item.size) ? " · " + esc(loc(item.size)) : "") + "</span></div>" +
               '<span class="coprice">' + money(item.price * qty) + "</span>" +
-              '<a class="buy" href="' + esc(item.url) + '" target="_blank" rel="noopener noreferrer">' + esc(t("payNow")) + "</a>" +
+              '<a class="buy' + (done ? " is-done" : "") + '" href="' + esc(item.url) + '" target="_blank" rel="noopener noreferrer" data-pay="' + esc(id) + '">' + esc(btnLabel) + "</a>" +
             "</div>"
           );
         }).join("");
@@ -1615,6 +1722,7 @@ lblSeason: "Serie / referencia",
           rows +
           '<div class="cp-checkout" id="checkoutZone">' +
             "<h4>" + esc(t("coTitle")) + "</h4>" +
+            '<div class="co-progress">' + esc(progressLabel) + "</div>" +
             "<p>" + esc(t("coText")) + "</p>" +
             checkoutRows +
           "</div>";
@@ -1622,7 +1730,7 @@ lblSeason: "Serie / referencia",
         cartFoot.innerHTML =
           '<div class="cp-total"><span class="tlabel">' + esc(t("totalUsd")) + '</span><span class="tval">' + money(cartTotal()) + "</span></div>" +
           '<p class="note">' + esc(t("cartNote")) + "</p>" +
-          '<button class="checkout-btn" type="button" id="goCheckout">' + esc(t("goCheckout")) + "</button>";
+          '<button class="copy-links-btn" type="button" id="copyCartLinks">' + esc(t("copyAllLinks")) + "</button>";
 
         cartBody.querySelectorAll("[data-inc]").forEach(function (el) {
           el.addEventListener("click", function () { addToCart(el.getAttribute("data-inc"), 1); });
@@ -1631,10 +1739,22 @@ lblSeason: "Serie / referencia",
           el.addEventListener("click", function () { addToCart(el.getAttribute("data-dec"), -1); });
         });
         cartBody.querySelectorAll("[data-rm]").forEach(function (el) {
-          el.addEventListener("click", function () { delete cart[el.getAttribute("data-rm")]; renderCart(); });
+          el.addEventListener("click", function () {
+            var rid = el.getAttribute("data-rm");
+            delete cart[rid];
+            delete cartOpened[rid];
+            renderCart();
+          });
         });
-        document.getElementById("goCheckout").addEventListener("click", function () {
-          document.getElementById("checkoutZone").scrollIntoView({ behavior: "smooth", block: "start" });
+        cartBody.querySelectorAll("[data-pay]").forEach(function (el) {
+          el.addEventListener("click", function () {
+            cartOpened[el.getAttribute("data-pay")] = true;
+            /* Re-render on next tick so the new tab still opens from this click. */
+            setTimeout(renderCart, 0);
+          });
+        });
+        document.getElementById("copyCartLinks").addEventListener("click", function () {
+          copyCartLinks(ids);
         });
       }
 
