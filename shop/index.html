@@ -216,6 +216,7 @@
         font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-decoration: none; background: var(--bg-raise); color: var(--ink-soft);
       }
       .alllinks a.lchip:hover { background: var(--blood); border-color: var(--blood-bright); color: #ededed; }
+      .alllinks a.lchip { white-space: nowrap; display: inline-block; margin: 3px 2px; }
       .alllinks .none { font-size: 15px; color: var(--ink-faint); }
       .sheet-meta {
         display: flex; flex-wrap: wrap; gap: 8px 28px; padding: 12px 0 0;
@@ -594,14 +595,9 @@
           加购物车或直接购买——付款走 <strong>Lolobuy / 微店</strong>，下单后直接寄到你家。
         </p>
 
-        <div class="coupon">
-          <span class="big" data-i18n="couponBig">Lolobuy 500$ 运费券</span>
-          <span class="note" data-i18n="couponNote">新用户福利：领取运费券礼包，通过 Lolobuy 下单时抵扣运费。</span>
-          <span class="pending" id="couponSlot">领取运费券 ↗</span>
-        </div>
 
         <div class="alllinks" id="allLinksBar">
-          <span class="cap" data-i18n="allLinksCap">我的全部链接 · All my links</span>
+          <span class="cap" data-i18n="allLinksCap">联系我 · 有问题随时私信</span>
           <span id="allLinks"></span>
         </div>
       </section>
@@ -783,7 +779,11 @@
       /* Header promo + links — owner fills these in.
          COUPON_URL: the Lolobuy coupon claim link. MY_LINKS: [{label, url}]. */
       var COUPON_URL = "https://m.lolobuy.com/index?inviteCode=3smqb";
-      var MY_LINKS = [];
+      var MY_LINKS = [
+        { label: "Instagram", url: "https://www.instagram.com/13enji1013" },
+        { label: "Telegram", url: "https://t.me/+8613168596658" },
+        { label: "Discord", url: "https://discord.gg/rXf6TWCA" }
+      ];
 
       /* Right rail — affiliated stores: [{name, url}] */
       var STORES = [];
@@ -806,7 +806,7 @@
           couponBig: "Lolobuy 500$ 运费券",
           couponNote: "新用户福利：领取运费券礼包，通过 Lolobuy 下单时抵扣运费。",
           couponPending: "领取运费券 ↗", couponClaim: "领取运费券 ↗",
-          allLinksCap: "我的全部链接 · All my links",
+          allLinksCap: "联系我 · 有问题随时私信",
           searchPh: "搜索品牌、商品、款式…", searchAria: "搜索商品",
           subtypeAria: "按细分款式筛选", groupAria: "分组方式",
           fBrand: "品牌", fSubtype: "细分款式", fGroup: "分组",
@@ -854,7 +854,7 @@ lblSeason: "系列 / 款号",
           cartEmptyBig: "购物车是空的",
           cartEmptyText: "去货架上逛逛，挑中了点「加入购物车」，结账时再一起去购买页面付款。",
           cartNoteEmpty: "付款在 Lolobuy / 微店完成——每件商品各有自己的购买页面。",
-          cartNote: "合计是购物车里商品的标价总和；运费等其他费用以付款页面为准，下单别忘了用运费券。",
+          cartNote: "合计是购物车里商品的标价总和；运费等其他费用以付款页面为准。",
           toastAdded: "已加入购物车。", toastAddedQty: "已加入购物车（× {n}）。",
 
 
@@ -869,7 +869,7 @@ lblSeason: "系列 / 款号",
           couponBig: "Lolobuy $500 shipping coupons",
           couponNote: "New here? Claim your shipping-coupon pack and save on delivery when you order through Lolobuy.",
           couponPending: "Claim coupons ↗", couponClaim: "Claim coupons ↗",
-          allLinksCap: "All my links",
+          allLinksCap: "Contact me · DM anytime with questions",
           searchPh: "Search brand, product, style…", searchAria: "Search products",
           subtypeAria: "Filter by style", groupAria: "Grouping",
           fBrand: "Brand", fSubtype: "Style", fGroup: "Group by",
@@ -917,7 +917,7 @@ lblSeason: "Series / SKU",
           cartEmptyBig: "Your cart is empty",
           cartEmptyText: "Browse the shelf, add what you like to the cart, and pay on the buy pages at checkout.",
           cartNoteEmpty: "Payment happens on Lolobuy / Weidian — each item has its own buy page.",
-          cartNote: "The total is the sum of the listed prices in your cart; shipping and other fees follow the payment page — don't forget your shipping coupons when you order.",
+          cartNote: "The total is the sum of the listed prices in your cart; shipping and other fees follow the payment page.",
           toastAdded: "Added to cart.", toastAddedQty: "Added to cart (× {n}).",
 
 
@@ -932,7 +932,7 @@ lblSeason: "Series / SKU",
           couponBig: "Купоны Lolobuy на доставку — $500",
           couponNote: "Вы здесь впервые? Заберите набор купонов на доставку и экономьте при заказе через Lolobuy.",
           couponPending: "Получить купоны ↗", couponClaim: "Получить купоны ↗",
-          allLinksCap: "Все мои ссылки",
+          allLinksCap: "Связаться со мной · пишите с любыми вопросами",
           searchPh: "Поиск: бренд, товар, стиль…", searchAria: "Поиск товаров",
           subtypeAria: "Фильтр по подтипу", groupAria: "Группировка",
           fBrand: "Бренд", fSubtype: "Подтип", fGroup: "Группировка",
@@ -980,7 +980,7 @@ lblSeason: "Серия / артикул",
           cartEmptyBig: "Корзина пуста",
           cartEmptyText: "Загляните на полку, добавьте понравившееся в корзину, а при оформлении оплатите на страницах покупки.",
           cartNoteEmpty: "Оплата проходит в Lolobuy / Weidian — у каждого товара своя страница покупки.",
-          cartNote: "Итого — сумма цен товаров в корзине; доставка и прочие сборы указаны на странице оплаты. Не забудьте купоны на доставку при заказе.",
+          cartNote: "Итого — сумма цен товаров в корзине; доставка и прочие сборы указаны на странице оплаты.",
           toastAdded: "Добавлено в корзину.", toastAddedQty: "Добавлено в корзину (× {n}).",
 
 
@@ -995,7 +995,7 @@ lblSeason: "Серия / артикул",
           couponBig: "Cupones de envío Lolobuy de $500",
           couponNote: "¿Es tu primera vez aquí? Reclama tu paquete de cupones de envío y ahorra en la entrega al pedir por Lolobuy.",
           couponPending: "Reclamar cupones ↗", couponClaim: "Reclamar cupones ↗",
-          allLinksCap: "Todos mis enlaces",
+          allLinksCap: "Contáctame · escríbeme si tienes dudas",
           searchPh: "Buscar marca, producto, estilo…", searchAria: "Buscar productos",
           subtypeAria: "Filtrar por estilo", groupAria: "Agrupación",
           fBrand: "Marca", fSubtype: "Estilo", fGroup: "Agrupar",
@@ -1043,7 +1043,7 @@ lblSeason: "Serie / referencia",
           cartEmptyBig: "Tu carrito está vacío",
           cartEmptyText: "Pasea por el estante, añade lo que te guste al carrito y paga en las páginas de compra al finalizar la compra.",
           cartNoteEmpty: "El pago se hace en Lolobuy / Weidian: cada producto tiene su propia página de compra.",
-          cartNote: "El total es la suma de los precios indicados en tu carrito; el envío y otros cargos dependen de la página de pago. No olvides usar tus cupones de envío al pedir.",
+          cartNote: "El total es la suma de los precios indicados en tu carrito; el envío y otros cargos dependen de la página de pago.",
           toastAdded: "Añadido al carrito.", toastAddedQty: "Añadido al carrito (× {n}).",
 
 
@@ -1243,7 +1243,8 @@ lblSeason: "Serie / referencia",
       /* ---------- header promo + links ---------- */
       function renderHeaderBits() {
         var slot = document.getElementById("couponSlot");
-        if (COUPON_URL) {
+        if (!slot) {
+        } else if (COUPON_URL) {
           slot.outerHTML =
             '<a class="claim" id="couponSlot" href="' + esc(COUPON_URL) + '" target="_blank" rel="noopener noreferrer">' + esc(t("couponClaim")) + "</a>";
         } else if (slot.tagName !== "SPAN") {
