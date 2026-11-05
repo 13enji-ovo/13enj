@@ -3,7 +3,7 @@
 
 Synced per product (rawUrl must contain itemID=...):
   cny      Weidian price in yuan (discount low price if present, else original)
-  price    USD = round(cny * RATE)
+  price    USD = round(cny * RATE, 2)
   size     joined values of the 尺码 attribute ("S / M / L / XL")
   soldout  true if delisted / no result / stock 0; false when back
   wdTitle  last seen Weidian itemTitle (double spaces normalized)
@@ -211,7 +211,7 @@ def compute(p, data):
         cny = fen / 100
         cny = int(cny) if cny == int(cny) else round(cny, 2)
         want["cny"] = cny
-        want["price"] = round(cny * RATE)
+        want["price"] = round(cny * RATE, 2)
     for a in res.get("attrList") or []:
         if norm(a.get("attrTitle")) == "尺码":
             vals = [norm(v.get("attrValue")) for v in a.get("attrValues") or [] if v.get("attrValue")]

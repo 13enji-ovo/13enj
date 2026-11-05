@@ -844,7 +844,7 @@
          sizeChartNote {lang: text} (per-product size-chart columns); check may be {lang: text}.
          cny/price/size/soldout/wdTitle/title.zh/img/imgs/wdImgs are kept in
          sync with Weidian by tools/sync_weidian.py (GitHub Action every 30 min).
-         USD price = round(cny * RATE), RATE defined in that script.
+         USD price = round(cny * RATE, 2), RATE defined in that script.
          Optional wdImgsExclude: source URLs or "sha256:…" hashes never re-added.
          Multilingual fields (for batch imports): title, subtype, note and
          size may be a plain string OR an object keyed by language, e.g.
@@ -901,8 +901,8 @@
       ]
     ],
     "grade": "B",
-    "price": 65,
-    "cny": 400,
+    "price": 39.99,
+    "cny": 245.41,
     "img": "img/wd7893266356-1.jpg",
     "url": "https://www.lolobuy.com/productDetail/7893266356?url=https://weidian.com/item.html?itemID=7893266356&inviteCode=3smqb",
     "rawUrl": "https://weidian.com/item.html?itemID=7893266356",
@@ -997,8 +997,8 @@
       "es": "Medidas de la prenda tomadas a mano; una variación de 1–2 cm es normal"
     },
     "grade": "B",
-    "price": 57,
-    "cny": 350,
+    "price": 39.99,
+    "cny": 245.41,
     "img": "img/wd7890305133-1.jpg",
     "imgs": [
       "img/wd7890305133-1.jpg",
@@ -1399,7 +1399,7 @@ lblSeason: "Serie / referencia",
         return out;
       }
 
-      function money(n) { return "$" + Number(n).toLocaleString(LOCALES[LANG] || "zh-CN"); }
+      function money(n) { n = Math.round(Number(n) * 100) / 100; var d = n % 1 ? 2 : 0; return "$" + n.toLocaleString(LOCALES[LANG] || "zh-CN", { minimumFractionDigits: d, maximumFractionDigits: 2 }); }
 
       function findProduct(id) {
         return PRODUCTS.find(function (p) { return p.id === id; }) || null;
