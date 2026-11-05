@@ -428,12 +428,81 @@
       dialog.pd { max-width: min(880px, calc(100vw - 28px)); }
       .pd-grid { display: grid; gap: 0; grid-template-columns: 1fr; }
       @media (min-width: 680px) { .pd-grid { grid-template-columns: 1fr 1fr; } }
-      .pd-grid .pd-img { background: var(--imgbg); min-height: 300px; }
-      .pd-grid .pd-img img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.86) contrast(1.06) brightness(0.94); }
-      .pd-grid .pd-img .pd-thumbs { display: flex; gap: 6px; padding: 6px; }
-      .pd-grid .pd-img .pd-thumbs img { width: 64px; height: 64px; cursor: pointer; }
+      .pd-grid .pd-img { background: var(--imgbg); display: flex; flex-direction: column; }
+      .pd-gallery { display: flex; flex-direction: column; gap: 10px; padding: 0 0 12px; }
+      .pd-stage {
+        position: relative; width: 100%; aspect-ratio: 4 / 5;
+        background: #101010;
+        border-bottom: 1px solid var(--line);
+        overflow: hidden;
+      }
+      .pd-carousel {
+        display: flex; width: 100%; height: 100%;
+        overflow-x: auto; overflow-y: hidden;
+        scroll-snap-type: x mandatory; scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .pd-carousel::-webkit-scrollbar { display: none; }
+      .pd-slide {
+        flex: 0 0 100%; width: 100%; height: 100%;
+        scroll-snap-align: start; scroll-snap-stop: always;
+        display: grid; place-items: center; background: #101010;
+      }
+      .pd-slide img {
+        width: 100%; height: 100%; object-fit: contain; object-position: center;
+        filter: saturate(0.86) contrast(1.06) brightness(0.94);
+        pointer-events: none; user-select: none;
+      }
+      .pd-nav {
+        position: absolute; top: 50%; transform: translateY(-50%);
+        width: 34px; height: 34px; border-radius: 2px;
+        border: 1px solid var(--line-strong); background: rgba(8,8,8,0.72);
+        color: var(--ink); font-size: 18px; line-height: 1; padding: 0;
+        display: none; align-items: center; justify-content: center;
+        backdrop-filter: blur(4px);
+      }
+      .pd-nav:hover { background: var(--blood); border-color: var(--blood-bright); color: #ededed; }
+      .pd-nav.prev { left: 8px; }
+      .pd-nav.next { right: 8px; }
+      @media (min-width: 680px) {
+        .pd-gallery.multi .pd-nav { display: inline-flex; }
+      }
+      .pd-counter {
+        position: absolute; right: 10px; bottom: 10px;
+        font-family: "Cinzel", serif; font-size: 10px; font-weight: 700;
+        letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--ink); background: rgba(0,0,0,0.55);
+        border: 1px solid var(--line-strong); border-radius: 2px;
+        padding: 4px 8px; pointer-events: none;
+      }
+      .pd-gallery:not(.multi) .pd-counter { display: none; }
+      .pd-dots {
+        display: none; justify-content: center; gap: 7px; padding: 0 12px;
+      }
+      .pd-gallery.multi .pd-dots { display: flex; }
+      .pd-dots button {
+        width: 7px; height: 7px; border-radius: 50%; padding: 0;
+        border: 1px solid var(--line-strong); background: transparent;
+      }
+      .pd-dots button.on { background: var(--ink-soft); border-color: var(--ink-soft); }
+      .pd-thumbs {
+        display: none; gap: 8px; padding: 0 12px; overflow-x: auto;
+        -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+      }
+      .pd-gallery.multi .pd-thumbs { display: flex; }
+      .pd-thumbs button {
+        flex: 0 0 auto; width: 56px; height: 70px; padding: 0;
+        border: 1px solid var(--line-strong); border-radius: 2px;
+        background: #0c0c0c; overflow: hidden; opacity: 0.72;
+      }
+      .pd-thumbs button.on { opacity: 1; border-color: var(--ink-soft); box-shadow: 0 0 0 1px var(--ink-soft); }
+      .pd-thumbs button img {
+        width: 100%; height: 100%; object-fit: cover;
+        filter: saturate(0.86) contrast(1.06) brightness(0.94);
+      }
       .pd-grid .pd-img .noimg {
-        height: 100%; min-height: 300px; display: grid; place-items: center; padding: 18px;
+        aspect-ratio: 4 / 5; display: grid; place-items: center; padding: 18px;
         font-family: "Cinzel", serif; font-size: 12px; letter-spacing: 0.18em;
         text-transform: uppercase; color: var(--ink-faint); text-align: center;
         background:
@@ -743,9 +812,10 @@
            cny （微店价, 元）, wdTitle （上次同步的微店标题）, soldout (bool) }
          Optional: imgs [extra photo URLs, gallery], sizeChartHead {lang: [col headers]},
          sizeChartNote {lang: text} (per-product size-chart columns); check may be {lang: text}.
-         cny/price/size/soldout/wdTitle/title.zh are kept in sync with Weidian
-         by tools/sync_weidian.py (GitHub Action every 30 min). USD price =
-         round(cny * RATE), RATE defined in that script.
+         cny/price/size/soldout/wdTitle/title.zh/img/imgs/wdImgs are kept in
+         sync with Weidian by tools/sync_weidian.py (GitHub Action every 30 min).
+         USD price = round(cny * RATE), RATE defined in that script.
+         Optional wdImgsExclude: source URLs or "sha256:…" hashes never re-added.
          Multilingual fields (for batch imports): title, subtype, note and
          size may be a plain string OR an object keyed by language, e.g.
            "title": { "zh": "…", "en": "…", "ru": "…", "es": "…" }
@@ -756,7 +826,12 @@
   {
     "id": "wd7893266356",
     "brand": "13enj!",
-    "subtype": { "zh": "连帽外套", "en": "Hooded Jacket", "ru": "Куртка с капюшоном", "es": "Chaqueta con capucha" },
+    "subtype": {
+      "zh": "连帽外套",
+      "en": "Hooded Jacket",
+      "ru": "Куртка с капюшоном",
+      "es": "Chaqueta con capucha"
+    },
     "season": "AW04",
     "title": {
       "zh": "自主Number(N)ine风格aw04 Black Tribal Heart黑色荆棘连帽外套",
@@ -765,17 +840,62 @@
       "es": "Chaqueta con capucha Black Tribal Heart original estilo Number (N)ine AW04"
     },
     "size": "S / M / L / XL",
-    "sizeChart": [["S", 52, 64, 45, 75], ["M", 56, 68, 47, 76], ["L", 60, 72, 49, 77], ["XL", 64, 76, 51, 78]],
+    "sizeChart": [
+      [
+        "S",
+        52,
+        64,
+        45,
+        75
+      ],
+      [
+        "M",
+        56,
+        68,
+        47,
+        76
+      ],
+      [
+        "L",
+        60,
+        72,
+        49,
+        77
+      ],
+      [
+        "XL",
+        64,
+        76,
+        51,
+        78
+      ]
+    ],
     "grade": "B",
     "price": 65,
     "cny": 400,
-    "img": "img/aw04-tribal-heart-hoodie-900.jpg",
+    "img": "img/wd7893266356-1.jpg",
     "url": "https://www.lolobuy.com/productDetail/7893266356?url=https://weidian.com/item.html?itemID=7893266356&inviteCode=3smqb",
     "rawUrl": "https://weidian.com/item.html?itemID=7893266356",
     "note": "",
     "check": "",
     "wdTitle": "自主Number(N)ine风格aw04 Black Tribal Heart黑色荆棘连帽外套",
-    "soldout": false
+    "soldout": false,
+    "imgs": [
+      "img/wd7893266356-1.jpg",
+      "img/wd7893266356-2.jpg",
+      "img/wd7893266356-3.jpg",
+      "img/wd7893266356-4.jpg",
+      "img/wd7893266356-5.jpg",
+      "img/wd7893266356-6.jpg"
+    ],
+    "wdImgs": [
+      "https://si.geilicdn.com/wdseller2118673871-3ceb000001a1a8c9ab3f0a2394ee_1170_1555.jpg",
+      "https://si.geilicdn.com/wdseller2118673871-498d000001a1a8c9ab430a23049c_1170_1555.jpg",
+      "https://si.geilicdn.com/wdseller2118673871-4b40000001a1a8c9ab420a22c148_1170_1550.jpg",
+      "https://si.geilicdn.com/wdseller2118673871-4af2000001a1a8c9abb50a2301ec_1170_1551.jpg",
+      "https://si.geilicdn.com/wdseller2118673871-49d3000001a1a8c9ac2a0a2313e2_1170_1564.jpg",
+      "https://si.geilicdn.com/wdseller2118673871-0d9f000001a1a8c9acab0a23c1da_1170_1557.jpg"
+    ]
   },
   {
     "id": "wd7890305133",
@@ -794,7 +914,26 @@
       "es": "Chaqueta con cremallera original estilo Number (N)ine, terciopelo con calavera bordada, corte holgado"
     },
     "size": "S / M / L",
-    "sizeChart": [["S", 60, 104, 73], ["M", 62, 110, 74], ["L", 64, 116, 75]],
+    "sizeChart": [
+      [
+        "S",
+        60,
+        104,
+        73
+      ],
+      [
+        "M",
+        62,
+        110,
+        74
+      ],
+      [
+        "L",
+        64,
+        116,
+        75
+      ]
+    ],
     "sizeChartHead": {
       "zh": [
         "尺码",
@@ -830,11 +969,11 @@
     "grade": "B",
     "price": 57,
     "cny": 350,
-    "img": "img/n9-skull-velvet-zip-front.jpg",
+    "img": "img/wd7890305133-1.jpg",
     "imgs": [
-      "img/n9-skull-velvet-zip-front.jpg",
-      "img/n9-skull-velvet-zip-open.jpg",
-      "img/n9-skull-velvet-zip-back.jpg"
+      "img/wd7890305133-1.jpg",
+      "img/wd7890305133-2.jpg",
+      "img/wd7890305133-3.jpg"
     ],
     "url": "https://www.lolobuy.com/productDetail/7890305133?url=https://weidian.com/item.html?itemID=7890305133&inviteCode=3smqb",
     "rawUrl": "https://weidian.com/item.html?itemID=7890305133",
@@ -851,7 +990,15 @@
       "es": "Diseño independiente con el espíritu de la época de archivo de Number (N)ine. Terciopelo con calavera bordada, cierre de cremallera y corte holgado: una pieza que parece rescatada del fondo de un armario antiguo. Pieza original 'de estilo', no es una prenda auténtica de Number (N)ine. Preventa: se envía en un plazo de 15 días tras el pago."
     },
     "wdTitle": "自主Number(N)ine风格 骷髅丝绒刺绣拉链夹克外套 宽松开衫",
-    "soldout": false
+    "soldout": false,
+    "wdImgs": [
+      "https://si.geilicdn.com/wdseller2118673871-310d000001a1a9f7b1500a81347d_1170_1161.jpg",
+      "https://si.geilicdn.com/pcitem2118673871-74dd000001a1a9ec1ddf0a231316_1287_1287.jpg",
+      "https://si.geilicdn.com/pcitem2118673871-7d60000001a1a9ec19ac0a231177_1080_1080.jpg"
+    ],
+    "wdImgsExclude": [
+      "sha256:37020a074c7945be88053811b67dfdd2fe47b8e6e2009fce3da00e2c140ee2d2"
+    ]
   }
 ];
 
@@ -1539,15 +1686,68 @@ lblSeason: "Serie / referencia",
         document.getElementById("pdCheck").textContent = loc(item.check) || t("pdNoDesc");
         document.getElementById("pdPrice").textContent = money(item.price);
         var pdAlt = esc(item.brand + " — " + loc(item.title));
-        document.getElementById("pdImg").innerHTML = item.img
-          ? '<img id="pdMainImg" src="' + esc(item.img) + '" alt="' + pdAlt + '" />' +
-            (item.imgs && item.imgs.length > 1
-              ? '<div class="pd-thumbs">' + item.imgs.map(function (u) {
-                  return '<img src="' + esc(u) + '" alt="' + pdAlt + '" loading="lazy" onclick="document.getElementById(\'pdMainImg\').src=this.src" />';
-                }).join("") + "</div>"
-              : "")
-          : '<div class="noimg">' + esc(item.brand) + "<br/>" + esc(t("noPhoto")) + "</div>";
+        var pdImgEl = document.getElementById("pdImg");
+        var gallery = (item.imgs && item.imgs.length ? item.imgs.slice() : (item.img ? [item.img] : []));
+        if (!gallery.length) {
+          pdImgEl.innerHTML = '<div class="noimg">' + esc(item.brand) + "<br/>" + esc(t("noPhoto")) + "</div>";
+        } else {
+          var multi = gallery.length > 1;
+          var slides = gallery.map(function (u, i) {
+            return '<div class="pd-slide" data-i="' + i + '"><img src="' + esc(u) + '" alt="' + pdAlt + '" draggable="false" /></div>';
+          }).join("");
+          var thumbs = multi ? gallery.map(function (u, i) {
+            return '<button type="button" class="pd-thumb' + (i === 0 ? " on" : "") + '" data-i="' + i + '" aria-label="' + (i + 1) + '">' +
+              '<img src="' + esc(u) + '" alt="" loading="lazy" draggable="false" /></button>';
+          }).join("") : "";
+          var dots = multi ? gallery.map(function (_u, i) {
+            return '<button type="button" class="pd-dot' + (i === 0 ? " on" : "") + '" data-i="' + i + '" aria-label="' + (i + 1) + '"></button>';
+          }).join("") : "";
+          pdImgEl.innerHTML =
+            '<div class="pd-gallery' + (multi ? " multi" : "") + '">' +
+              '<div class="pd-stage">' +
+                '<div class="pd-carousel" id="pdCarousel">' + slides + "</div>" +
+                (multi ? '<button type="button" class="pd-nav prev" id="pdPrev" aria-label="Previous">‹</button>' +
+                         '<button type="button" class="pd-nav next" id="pdNext" aria-label="Next">›</button>' +
+                         '<div class="pd-counter" id="pdCounter">1/' + gallery.length + "</div>" : "") +
+              "</div>" +
+              (multi ? '<div class="pd-dots" id="pdDots">' + dots + "</div>" +
+                       '<div class="pd-thumbs" id="pdThumbs">' + thumbs + "</div>" : "") +
+            "</div>";
+          if (multi) bindPdGallery(gallery.length);
+        }
         document.getElementById("pdBuy").innerHTML = buyHTML(item);
+      }
+
+      function bindPdGallery(n) {
+        var car = document.getElementById("pdCarousel");
+        var counter = document.getElementById("pdCounter");
+        var dots = document.getElementById("pdDots");
+        var thumbs = document.getElementById("pdThumbs");
+        var idx = 0;
+        function slideWidth() { return car.clientWidth || 1; }
+        function setUI(i) {
+          idx = Math.max(0, Math.min(n - 1, i));
+          if (counter) counter.textContent = (idx + 1) + "/" + n;
+          if (dots) Array.prototype.forEach.call(dots.children, function (el, j) { el.classList.toggle("on", j === idx); });
+          if (thumbs) Array.prototype.forEach.call(thumbs.children, function (el, j) { el.classList.toggle("on", j === idx); });
+        }
+        function go(i, smooth) {
+          setUI(i);
+          car.scrollTo({ left: idx * slideWidth(), behavior: smooth === false ? "auto" : "smooth" });
+        }
+        car.addEventListener("scroll", function () {
+          var i = Math.round(car.scrollLeft / slideWidth());
+          if (i !== idx) setUI(i);
+        }, { passive: true });
+        document.getElementById("pdPrev").addEventListener("click", function () { go(idx - 1); });
+        document.getElementById("pdNext").addEventListener("click", function () { go(idx + 1); });
+        if (dots) dots.addEventListener("click", function (e) {
+          var b = e.target.closest("[data-i]"); if (b) go(+b.getAttribute("data-i"));
+        });
+        if (thumbs) thumbs.addEventListener("click", function (e) {
+          var b = e.target.closest("[data-i]"); if (b) go(+b.getAttribute("data-i"));
+        });
+        setUI(0);
       }
 
       function openDetail(id) {
