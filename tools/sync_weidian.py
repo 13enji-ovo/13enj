@@ -130,6 +130,28 @@ def compute(p, data):
     return want, "ok"
 
 
+LINKTREE = "https://linktr.ee/13enji.shop"
+
+
+def fetch_linktree():
+    """Public Linktree links (excluding the shop itself) as [{label, url}]."""
+    html = subprocess.run(["curl", "-sL", "--max-time", "40", "-A", "Mozilla/5.0", LINKTREE],
+                          capture_output=True, check=True).stdout.decode("utf-8", "replace")
+    m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.S)
+    acc = json.loads(m.group(1))["props"]["pageProps"]["account"]
+    out = []
+    for l in acc.get("links") or []:
+        url, title = (l.get("url") or "").strip(), norm(l.get("title"))
+        if not url or not title or "13enji-ovo.github.io" in url:
+            continue
+        out.append({"label": title, "url": url})
+    for l in acc.get("socialLinks") or []:
+        url = (l.get("url") or "").strip()
+        if url and all(url != o["url"] for o in out):
+            out.append({"label": (l.get("type") or "Link").title(), "url": url})
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--file", default=os.path.join(ROOT, "shop", "index.html"))
@@ -207,11 +229,26 @@ def main():
                 if i not in existing: f.write(i + "\n")
         print("NEEDS TRANSLATION (title.zh changed):", " ".join(retitled))
 
+    out = text[:m.start(1)] + new_arr + text[m.end(1):] if changes else text
+    if changes:
+        json.loads(new_arr)  # sanity
+    # --- Linktree contact links -> MY_LINKS ---
+    try:
+        links = fetch_linktree()
+        if links:
+            js = "var MY_LINKS = " + json.dumps(links, ensure_ascii=False, indent=2).replace("\n", "\n      ") + ";"
+            out2, k = re.subn(r"var MY_LINKS = \[.*?\];", lambda _m: js, out, count=1, flags=re.S)
+            if k and out2 != out:
+                out = out2
+                changes.append("MY_LINKS <- Linktree: " + ", ".join(l["label"] for l in links))
+            print("Linktree: %d contact link(s)%s" % (len(links), "" if out2 == out and k else ""))
+    except Exception as ex:
+        print("Linktree SKIP: %s" % ex)
+
     if not changes:
         print("No changes.%s" % (" (%d item errors)" % errors if errors else ""))
         return
-    out = text[:m.start(1)] + new_arr + text[m.end(1):]
-    json.loads(new_arr)  # sanity
+    for c in changes: print("  CHANGE: " + c)
     if a.dry_run:
         print("Dry run: %d change(s), file not written." % len(changes)); return
     open(a.file, "w", encoding="utf-8").write(out)
@@ -220,7 +257,7 @@ def main():
         g = ["git", "-C", ROOT]
         subprocess.run(g + ["add", "shop/index.html", "tools"], check=True)
         subprocess.run(g + ["-c", "user.name=13enji-ovo", "-c", "user.email=13enji-ovo@users.noreply.github.com",
-                            "commit", "-qm", "自动同步微店价格"], check=True)
+                            "commit", "-qm", "自动同步微店/Linktree"], check=True)
         subprocess.run(g + ["push", "-q"], check=True)
         print("Pushed.")
 
