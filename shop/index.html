@@ -535,6 +535,8 @@
       }
       .checkout-btn:hover { background: linear-gradient(180deg, #262626, #171717); border-color: var(--violet); }
       .checkout-btn:active { transform: translateY(1px); }
+      .buy.soldout { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+      .addcart:disabled { opacity: 0.4; cursor: not-allowed; }
       .checkout-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
       .toast {
@@ -732,7 +734,11 @@
          { id, brand, subtype （细分款式）, season （系列/款号）, title,
            size （规格）, grade （商品状态）, price (USD), img (photo URL),
            url (Lolobuy / 微店 buy link), rawUrl （微店/原始链接）,
-           note （备注）, check （商品说明） }
+           note （备注）, check （商品说明）,
+           cny （微店价, 元）, wdTitle （上次同步的微店标题）, soldout (bool) }
+         cny/price/size/soldout/wdTitle/title.zh are kept in sync with Weidian
+         by tools/sync_weidian.py (GitHub Action every 30 min). USD price =
+         round(cny * RATE), RATE defined in that script.
          Multilingual fields (for batch imports): title, subtype, note and
          size may be a plain string OR an object keyed by language, e.g.
            "title": { "zh": "…", "en": "…", "ru": "…", "es": "…" }
@@ -754,11 +760,14 @@
     "size": "S / M / L / XL",
     "grade": "B",
     "price": 65,
+    "cny": 400,
     "img": "img/aw04-tribal-heart-hoodie-900.jpg",
     "url": "https://www.lolobuy.com/productDetail/7893266356?url=https://weidian.com/item.html?itemID=7893266356&inviteCode=3smqb",
     "rawUrl": "https://weidian.com/item.html?itemID=7893266356",
     "note": "",
-    "check": ""
+    "check": "",
+    "wdTitle": "自主Number(N)ine风格aw04 Black Tribal Heart黑色荆棘连帽外套",
+    "soldout": false
   }
 ];
 
@@ -826,7 +835,7 @@ lblSeason: "系列 / 款号",
           dStatus: "状态", openRaw: "打开原始链接 ↗",
           pdNoDesc: "这件商品暂无更多说明，详情以卡片上的信息为准。",
           usdSeller: "美元 · 卖家定价", usd: "美元", qty: "数量", qtyWord: "数量",
-          buyNow: "立即购买 ↗", addToCart: "加入购物车",
+          buyNow: "立即购买 ↗", soldOut: "售罄", addToCart: "加入购物车",
           noPhoto: "暂无图片", fresh: "新上架", viewDetails: "查看详情：",
           unit: "单价", remove: "移除", decQty: "减少数量", incQty: "增加数量",
           total: "合计", totalUsd: "合计（美元）", checkout: "去结账", goCheckout: "去结账 · 去付款",
@@ -889,7 +898,7 @@ lblSeason: "Series / SKU",
           dStatus: "Status", openRaw: "Open original link ↗",
           pdNoDesc: "No extra details for this item yet — everything you need is on its card.",
           usdSeller: "USD · Seller's price", usd: "USD", qty: "Quantity", qtyWord: "Qty",
-          buyNow: "Buy now ↗", addToCart: "Add to cart",
+          buyNow: "Buy now ↗", soldOut: "Sold out", addToCart: "Add to cart",
           noPhoto: "No photo", fresh: "New", viewDetails: "View details: ",
           unit: "Unit", remove: "Remove", decQty: "Decrease quantity", incQty: "Increase quantity",
           total: "Total", totalUsd: "Total (USD)", checkout: "Checkout", goCheckout: "Checkout · Pay",
@@ -952,7 +961,7 @@ lblSeason: "Серия / артикул",
           dStatus: "Статус", openRaw: "Открыть исходную ссылку ↗",
           pdNoDesc: "Подробностей по этому товару пока нет — вся информация указана на его карточке.",
           usdSeller: "USD · Цена продавца", usd: "USD", qty: "Количество", qtyWord: "Кол-во",
-          buyNow: "Купить ↗", addToCart: "В корзину",
+          buyNow: "Купить ↗", soldOut: "Нет в наличии", addToCart: "В корзину",
           noPhoto: "Нет фото", fresh: "Новинка", viewDetails: "Подробнее: ",
           unit: "За шт.", remove: "Убрать", decQty: "Уменьшить количество", incQty: "Увеличить количество",
           total: "Итого", totalUsd: "Итого (USD)", checkout: "Оформить заказ", goCheckout: "Оформить · Оплатить",
@@ -1015,7 +1024,7 @@ lblSeason: "Serie / referencia",
           dStatus: "Estado", openRaw: "Abrir enlace original ↗",
           pdNoDesc: "Este producto aún no tiene detalles extra: todo lo que necesitas está en su tarjeta.",
           usdSeller: "USD · Precio del vendedor", usd: "USD", qty: "Cantidad", qtyWord: "Cant.",
-          buyNow: "Comprar ↗", addToCart: "Añadir al carrito",
+          buyNow: "Comprar ↗", soldOut: "Agotado", addToCart: "Añadir al carrito",
           noPhoto: "Sin foto", fresh: "Nuevo", viewDetails: "Ver detalles: ",
           unit: "Unidad", remove: "Quitar", decQty: "Reducir cantidad", incQty: "Aumentar cantidad",
           total: "Total", totalUsd: "Total (USD)", checkout: "Ir a pagar", goCheckout: "Finalizar · Pagar",
@@ -1103,6 +1112,7 @@ lblSeason: "Serie / referencia",
       }
 
       function buyHTML(item, cls) {
+        if (item.soldout) return '<span class="buy soldout ' + (cls || "") + '" aria-disabled="true">' + esc(t("soldOut")) + "</span>";
         return '<a class="buy ' + (cls || "") + '" href="' + esc(item.url) + '" target="_blank" rel="noopener noreferrer">' + esc(t("buyNow")) + "</a>";
       }
 
@@ -1114,7 +1124,7 @@ lblSeason: "Serie / referencia",
         var metaBits = [];
         if (loc(item.subtype)) metaBits.push(esc(loc(item.subtype)));
         metaBits.push(esc(loc(item.size) || (t("specLabel") + " —")));
-        metaBits.push(esc(gradeLabel(item.grade)));
+        metaBits.push(esc(item.soldout ? t("soldOut") : gradeLabel(item.grade)));
         return (
           '<article class="card">' +
             '<button class="imgwrap" type="button" data-pd="' + esc(item.id) + '" aria-label="' + esc(t("viewDetails") + loc(item.title)) + '">' +
@@ -1127,7 +1137,7 @@ lblSeason: "Serie / referencia",
               '<div class="meta">' + metaBits.join(" · ") + "</div>" +
               '<div class="pricerow"><span class="price">' + money(item.price) + "</span><small>" + esc(t("usd")) + "</small></div>" +
               '<div class="actions">' +
-                '<button class="addcart" type="button" data-add="' + esc(item.id) + '">' + esc(t("addToCart")) + "</button>" +
+                '<button class="addcart" type="button" data-add="' + esc(item.id) + '"' + (item.soldout ? " disabled" : "") + ">" + esc(t("addToCart")) + "</button>" +
                 buyHTML(item) +
               "</div>" +
             "</div>" +
@@ -1277,6 +1287,8 @@ lblSeason: "Serie / referencia",
       function cartTotal() { return cartIds().reduce(function (s, id) { return s + findProduct(id).price * cart[id]; }, 0); }
 
       function addToCart(id, qty) {
+        var _p = findProduct(id);
+        if (qty > 0 && _p && _p.soldout) return;
         if (!findProduct(id)) return;
         cart[id] = (cart[id] || 0) + qty;
         if (cart[id] <= 0) delete cart[id];
@@ -1319,7 +1331,7 @@ lblSeason: "Serie / referencia",
           var metaBits = [];
           if (loc(item.subtype)) metaBits.push(esc(loc(item.subtype)));
           if (loc(item.size)) metaBits.push(esc(t("specLabel")) + " " + esc(loc(item.size)));
-          metaBits.push(esc(gradeLabel(item.grade)));
+          metaBits.push(esc(item.soldout ? t("soldOut") : gradeLabel(item.grade)));
           return (
             '<div class="crow">' +
               '<div class="cthumb">' + media + "</div>" +
@@ -1401,7 +1413,8 @@ lblSeason: "Serie / referencia",
         document.getElementById("pdSubtype").textContent = loc(item.subtype) || "—";
         document.getElementById("pdSeason").textContent = item.season || "—";
         document.getElementById("pdSize").textContent = loc(item.size) || "—";
-        document.getElementById("pdGrade").textContent = gradeLabel(item.grade) || item.grade || "—";
+        document.getElementById("pdGrade").textContent = item.soldout ? t("soldOut") : (gradeLabel(item.grade) || item.grade || "—");
+        document.getElementById("pdAddCart").disabled = !!item.soldout;
         document.getElementById("pdRaw").innerHTML = item.rawUrl
           ? '<a href="' + esc(item.rawUrl) + '" target="_blank" rel="noopener noreferrer">' + esc(t("openRaw")) + "</a>"
           : "—";
